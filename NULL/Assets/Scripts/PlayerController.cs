@@ -78,6 +78,6 @@ public class PlayerController : MonoBehaviour
 
     bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.1f);
+        return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
     }
 }
