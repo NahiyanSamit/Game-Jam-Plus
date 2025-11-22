@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<Collider>().bounds.extents.y;
+        MessageManager.Instance.ShowMessage("Welcome to the game!\n\n" + "<b>Now you will understand the PAIN behind FUN -_- <b>", 5f);
     }
     
     void Update()
