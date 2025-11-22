@@ -4,6 +4,8 @@ using UnityEngine;
 public class SaveSystem : ScriptableObject
 {
     public Transform Player;
+  //sound system
+  //particle system
   
 
 }
