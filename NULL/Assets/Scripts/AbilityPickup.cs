@@ -9,35 +9,40 @@ public class AbilityPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // 1. Unlock in GameManager
-            GameManager.Instance.UnlockAbility(abilityToUnlock);
+            // 1. Unlock in GameManager (Backend logic)
+            if (GameManager.Instance != null)
+                GameManager.Instance.UnlockAbility(abilityToUnlock);
 
-            // 2. Update Visuals
-            FunManager.Instance.AddFun(5f);
+            // 2. Add Fun Points
+            if (FunManager.Instance != null)
+                FunManager.Instance.AddFun(5f);
+
+            // 3. Update Visuals (Art, Texture, Animation)
             PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
 
             if (visuals != null)
             {
-                // A. Unlock Static Model
-                if (abilityToUnlock == AbilityType.CharacterArt)
-                {
-                    visuals.UnlockArtModel(); 
-                }
-                
-                // B. Unlock Texture
-                if (abilityToUnlock == AbilityType.Texture)
-                {
-                    visuals.UnlockTexture();
-                }
+                if (abilityToUnlock == AbilityType.CharacterArt) visuals.UnlockArtModel(); 
+                if (abilityToUnlock == AbilityType.Texture) visuals.UnlockTexture();
+                if (abilityToUnlock == AbilityType.Animation) visuals.UnlockAnimationModel();
+            }
 
-                // C. Unlock Animation (Main Character)
-                if (abilityToUnlock == AbilityType.Animation)
+            // ------------------------------------------------------------
+            // 4. NEW: Enable the UI Panel inside the current scene
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.UI)
+            {
+                if (UIManager.Instance != null)
                 {
-                    visuals.UnlockAnimationModel();
+                    UIManager.Instance.EnableGameUI();
+                }
+                else
+                {
+                    Debug.LogError("No UIManager found in the scene! Did you create it?");
                 }
             }
 
-            // 3. Pickup Effect
+            // 5. Pickup Effect
             if (pickupEffect != null)
                 Instantiate(pickupEffect, transform.position, Quaternion.identity);
 
