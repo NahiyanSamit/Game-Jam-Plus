@@ -3,43 +3,41 @@ using UnityEngine;
 public class BreakableBox : MonoBehaviour
 {
     [Header("Settings")]
-    public int health = 3; // Set this to 3 in Inspector
+    public int health = 3; 
 
     [Header("Effects")]
-    public GameObject hitEffect;   // Plays every time you punch (Dust/Sparks)
-    public GameObject breakEffect; // Plays only when it finally breaks (Explosion)
+    public GameObject hitEffect;   
+    public GameObject breakEffect; 
 
-    // New function: We call this "TakeDamage" instead of just "Smash"
+    [Header("Loot")]
+    public GameObject coinPrefab; // Drag your Coin Prefab here
+
     public void TakeDamage()
     {
-        health--; // Decrease health by 1
+        health--; 
         
-        // Visual Feedback: Play hit effect if we have one
         if (hitEffect != null)
-        {
             Instantiate(hitEffect, transform.position, Quaternion.identity);
-        }
 
-        // Check if dead
         if (health <= 0)
         {
             Die();
-        }
-        else
-        {
-            Debug.Log("Box Hit! Health left: " + health);
         }
     }
 
     void Die()
     {
-        // Spawn explosion effect
         if (breakEffect != null)
-        {
             Instantiate(breakEffect, transform.position, Quaternion.identity);
+            
+        // --- NEW: SPAWN COIN ---
+        if (coinPrefab != null)
+        {
+            // Spawn the coin slightly above the ground so it doesn't fall through
+            Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
+            Instantiate(coinPrefab, spawnPos, Quaternion.identity);
         }
 
-        // Destroy the box
         Destroy(gameObject);
     }
 }

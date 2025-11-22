@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour
             // Check UI Blocking
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
+                
                 return;
             }
 
@@ -104,6 +105,9 @@ public class PlayerController : MonoBehaviour
             {
                 return;
             }
+
+            // SUCCESS
+            Debug.Log("5. PUNCH SUCCESS! Playing Animation...");
             
             characterAnimator.SetTrigger("Punch");
             if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(punchSound);
@@ -211,4 +215,5 @@ public class PlayerController : MonoBehaviour
     {
         return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
     }
+    
 }
