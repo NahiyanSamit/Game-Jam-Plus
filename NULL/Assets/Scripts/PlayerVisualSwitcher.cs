@@ -2,61 +2,74 @@ using UnityEngine;
 
 public class PlayerVisualSwitcher : MonoBehaviour
 {
-    [Header("Child Objects")]
-    public GameObject simpleCube;      // Drag 'Cube' here
-    public GameObject characterArt;    // Drag 'boy01_Body_Geo' here
+    [Header("Stage 1: Default")]
+    public GameObject simpleCube;       // Drag 'Cube' here
+
+    [Header("Stage 2: Art (Static T-Pose)")]
+    public GameObject characterArt;     // Drag your static 'boy01' here (No Animator)
+
+    [Header("Stage 3: Animation (Main Character)")]
+    public GameObject mainCharacter;    // Drag your 'Main Character' here (With Animator)
 
     [Header("Texture")]
-    public Material texturedMaterial;  // Drag your final material here
+    public Material texturedMaterial;   // Drag your final material here
 
-    private Animator _artAnimator;
+    // We store if the texture is unlocked so we can apply it to the Main Character
+    // automatically if we switch to it later.
+    private bool _textureIsUnlocked = false;
 
     void Start()
     {
-        // 1. Find the Animator on boy01_Body_Geo
-        if (characterArt != null)
-        {
-            _artAnimator = characterArt.GetComponent<Animator>();
-        }
-
-        // 2. Start: Cube ON, Boy OFF, Animation FROZEN
-        UpdateVisuals(false);
-        EnableAnimation(false);
+        // 1. Start State: Only Cube is active
+        simpleCube.SetActive(true);
+        characterArt.SetActive(false);
+        mainCharacter.SetActive(false);
     }
 
-    public void UpdateVisuals(bool hasUnlockedArt)
+    // STAGE 2: Switch from Cube to Static Art
+    public void UnlockArtModel()
     {
-        if (hasUnlockedArt)
-        {
-            simpleCube.SetActive(false);
-            characterArt.SetActive(true);
-        }
-        else
-        {
-            simpleCube.SetActive(true);
-            characterArt.SetActive(false);
-        }
+        simpleCube.SetActive(false);
+        characterArt.SetActive(true);
+        mainCharacter.SetActive(false);
+
+        // If we collected texture earlier, apply it now
+        if (_textureIsUnlocked) ApplyTexture(characterArt);
     }
 
-    public void UpdateTexture(bool hasUnlockedTexture)
+    // STAGE 3: Switch from Static Art to Main Character (Animation)
+    public void UnlockAnimationModel()
     {
-        if (hasUnlockedTexture)
-        {
-            // Apply texture to boy01_Body_Geo
-            Renderer rend = characterArt.GetComponent<Renderer>();
-            if (rend != null)
-            {
-                rend.material = texturedMaterial;
-            }
-        }
+        simpleCube.SetActive(false);
+        characterArt.SetActive(false);
+        mainCharacter.SetActive(true);
+
+        // If we collected texture earlier, apply it now
+        if (_textureIsUnlocked) ApplyTexture(mainCharacter);
     }
 
-    public void EnableAnimation(bool hasUnlockedAnim)
+    // TEXTURE: Apply material to whatever is currently visible
+    public void UnlockTexture()
     {
-        // This turns the Animator component ON or OFF
-        if (_artAnimator != null)
+        _textureIsUnlocked = true;
+
+        // Try to apply to both models (so they are ready when swapped)
+        ApplyTexture(characterArt);
+        ApplyTexture(mainCharacter);
+    }
+
+    // Helper function to find Renderer and set Material
+    private void ApplyTexture(GameObject targetObj)
+    {
+        if (targetObj == null) return;
+
+        Renderer r = targetObj.GetComponent<Renderer>();
+        // If not on the parent, look in the children (common for imported models)
+        if (r == null) r = targetObj.GetComponentInChildren<Renderer>();
+
+        if (r != null)
         {
-            _artAnimator.enabled = hasUnlockedAnim;
+            r.material = texturedMaterial;
         }
     }
 }
