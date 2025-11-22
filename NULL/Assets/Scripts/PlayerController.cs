@@ -4,10 +4,13 @@ public class PlayerController : MonoBehaviour
 {
     [Header("References")]
     public CameraFollow gameCamera; 
+    
+    // DRAG YOUR 'Main Character' (the one with the Animator) HERE
+    public Animator characterAnimator; 
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float turnSpeed = 15f; // Controls rotation smoothness
+    public float turnSpeed = 15f; 
     public float jumpForce = 8f;
 
     private Rigidbody _rb;
@@ -20,7 +23,10 @@ public class PlayerController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<Collider>().bounds.extents.y;
-        MessageManager.Instance.ShowMessage("Welcome to the game!\n\n" + "<b>Now you will understand the PAIN behind FUN -_- <b>", 5f);
+        
+        // Only show message if it exists (prevents errors if you removed MessageManager)
+        if (MessageManager.Instance != null)
+            MessageManager.Instance.ShowMessage("Welcome to the game!\n\n" + "<b>Now you will understand the PAIN behind FUN -_- <b>", 5f);
     }
     
     void Update()
@@ -33,6 +39,13 @@ public class PlayerController : MonoBehaviour
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
             {
                 _jumpRequest = true;
+
+                // TRIGGER JUMP ANIMATION
+                // We check if the animator is assigned and if the GameObject is actually active
+                if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
+                {
+                    characterAnimator.SetTrigger("Jump");
+                }
             }
             else
             {
@@ -40,17 +53,13 @@ public class PlayerController : MonoBehaviour
             }
         }
         
+        // --- CAMERA LOGIC ---
         if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
         {
             if (gameCamera != null)
             {
                 gameCamera.StartFollowing(transform);
                 _isCameraActive = true; 
-                Debug.Log("Camera activated!");
-            }
-            else
-            {
-                Debug.LogWarning("Camera ability unlocked, but 'Game Camera' is not assigned!");
             }
         }
     }
@@ -62,6 +71,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
         
+        // 1. Move Logic
         Vector3 movement = inputVector * moveSpeed;
         Vector3 targetPos = _rb.position + movement * Time.fixedDeltaTime;
         _rb.MovePosition(targetPos);
@@ -70,12 +80,20 @@ public class PlayerController : MonoBehaviour
         if (inputVector.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(inputVector);
-            
             Quaternion nextRotation = Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
-            
             _rb.MoveRotation(nextRotation);
         }
+
+        // --- ANIMATION MOVEMENT LOGIC ---
+        if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
+        {
+            // Pass the movement speed to the Animator
+            // 0 = Idle, 1 (or more) = Run
+            float currentSpeed = inputVector.magnitude; 
+            characterAnimator.SetFloat("Speed", currentSpeed);
+        }
         
+        // 3. Jump Physics
         if (_jumpRequest)
         {
             _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);

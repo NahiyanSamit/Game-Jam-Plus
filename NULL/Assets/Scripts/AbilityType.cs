@@ -4,5 +4,6 @@ public enum AbilityType
     Camera,
     CharacterArt,
     Texture,
-    Animation 
+    Animation,
+    UI
 }
