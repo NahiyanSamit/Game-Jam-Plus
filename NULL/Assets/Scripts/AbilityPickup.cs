@@ -9,15 +9,22 @@ public class AbilityPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            // ------------------------------------------------------------
             // 1. Unlock in GameManager (Backend logic)
+            // ------------------------------------------------------------
+            // This handles Jump, Camera, Punch, etc. automatically!
             if (GameManager.Instance != null)
                 GameManager.Instance.UnlockAbility(abilityToUnlock);
 
+            // ------------------------------------------------------------
             // 2. Add Fun Points
+            // ------------------------------------------------------------
             if (FunManager.Instance != null)
                 FunManager.Instance.AddFun(5f);
 
+            // ------------------------------------------------------------
             // 3. Update Visuals (Art, Texture, Animation)
+            // ------------------------------------------------------------
             PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
 
             if (visuals != null)
@@ -28,7 +35,7 @@ public class AbilityPickup : MonoBehaviour
             }
 
             // ------------------------------------------------------------
-            // 4. NEW: Enable the UI Panel inside the current scene
+            // 4. Enable the Main UI Panel
             // ------------------------------------------------------------
             if (abilityToUnlock == AbilityType.UI)
             {
@@ -36,13 +43,26 @@ public class AbilityPickup : MonoBehaviour
                 {
                     UIManager.Instance.EnableGameUI();
                 }
+            }
+
+            // ------------------------------------------------------------
+            // 5. NEW: Enable Sound Controls
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Sound)
+            {
+                if (SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.UnlockSoundControl();
+                }
                 else
                 {
-                    Debug.LogError("No UIManager found in the scene! Did you create it?");
+                    Debug.LogWarning("SoundManager is missing from the scene!");
                 }
             }
 
-            // 5. Pickup Effect
+            // ------------------------------------------------------------
+            // 6. Effect & Destroy
+            // ------------------------------------------------------------
             if (pickupEffect != null)
                 Instantiate(pickupEffect, transform.position, Quaternion.identity);
 
