@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic; // Required for Queue
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,40 +11,33 @@ public class PlayerController : MonoBehaviour
     public float turnSpeed = 15f; 
     public float jumpForce = 8f;
 
-    [Header("Respawn Settings")]
-    public float fallThreshold = -5f; // The Y level where player dies
-    public float rewindTime = 2f;     // How many seconds to go back
-
     private Rigidbody _rb;
     private float _distToGround;
     private bool _jumpRequest; 
     private bool _isCameraActive = false;
 
-    // RESPAWN VARIABLES
-    private Queue<Vector3> _positionHistory = new Queue<Vector3>();
-    private Vector3 _respawnPosition;
+    // Store model positions to fix animation drift
+    private Vector3 _initialModelLocalPos;
+    private Quaternion _initialModelLocalRot;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<Collider>().bounds.extents.y;
         
-        // Initialize respawn position to current start position to avoid errors
-        _respawnPosition = transform.position;
-
         if (MessageManager.Instance != null)
             MessageManager.Instance.ShowMessage("Welcome to the game!\n\n" + "<b>Now you will understand the PAIN behind FUN -_- <b>", 5f);
+
+        if (characterAnimator != null)
+        {
+            _initialModelLocalPos = characterAnimator.transform.localPosition;
+            _initialModelLocalRot = characterAnimator.transform.localRotation;
+        }
     }
     
     void Update()
     {
         if (GameManager.Instance == null) return;
-
-        // --- FALL CHECK (RESPAWN LOGIC) ---
-        if (transform.position.y < fallThreshold)
-        {
-            Respawn();
-        }
 
         // --- JUMP LOGIC ---
         if (Input.GetButtonDown("Jump") && IsGrounded())
@@ -54,9 +46,30 @@ public class PlayerController : MonoBehaviour
             {
                 _jumpRequest = true;
                 if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
-                {
                     characterAnimator.SetTrigger("Jump");
+            }
+            else
+            {
+                Debug.Log("You haven't unlocked Jump yet!");
+            }
+        }
+
+        // ----------------------------------------------------
+        // --- NEW: PUNCH LOGIC (Left Click) ---
+        // ----------------------------------------------------
+        if (Input.GetMouseButtonDown(0)) // 0 is Left Click
+        {
+            if (GameManager.Instance.HasAbility(AbilityType.Punch))
+            {
+                if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
+                {
+                    characterAnimator.SetTrigger("Punch");
+                    // Optional: Add sound effect here later
                 }
+            }
+            else
+            {
+                Debug.Log("You haven't unlocked Punching yet!");
             }
         }
         
@@ -73,18 +86,17 @@ public class PlayerController : MonoBehaviour
     
     void FixedUpdate()
     {
-        // --- 1. RECORD HISTORY FOR RESPAWN ---
-        TrackPositionHistory();
-
-        // --- MOVEMENT & PHYSICS ---
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
+
         Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
         
+        // Move Logic
         Vector3 movement = inputVector * moveSpeed;
         Vector3 targetPos = _rb.position + movement * Time.fixedDeltaTime;
         _rb.MovePosition(targetPos);
 
+        // Rotate Smoothly
         if (inputVector.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(inputVector);
@@ -92,12 +104,14 @@ public class PlayerController : MonoBehaviour
             _rb.MoveRotation(nextRotation);
         }
 
+        // Animation Parameters
         if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
         {
             float currentSpeed = inputVector.magnitude; 
             characterAnimator.SetFloat("Speed", currentSpeed);
         }
         
+        // Jump Physics
         if (_jumpRequest)
         {
             _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -105,45 +119,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // --- NEW HELPER METHODS ---
-
-    void TrackPositionHistory()
+    void LateUpdate()
     {
-        // Only record history if we are safely on the ground (optional, but feels better)
-        // If you want to rewind even if you were in the air, remove the IsGrounded() check.
-        if (IsGrounded()) 
+        if (characterAnimator != null)
         {
-            _positionHistory.Enqueue(transform.position);
+            characterAnimator.transform.localPosition = _initialModelLocalPos;
+            characterAnimator.transform.localRotation = _initialModelLocalRot;
         }
-
-        // Calculate how many frames represent 2 seconds
-        // Example: 2.0s / 0.02s per frame = 100 frames
-        int maxFrames = Mathf.RoundToInt(rewindTime / Time.fixedDeltaTime);
-
-        // If we have stored more frames than needed, remove the oldest one
-        // and save it as our "safe respawn point"
-        if (_positionHistory.Count > maxFrames)
-        {
-            _respawnPosition = _positionHistory.Dequeue();
-        }
-    }
-
-    void Respawn()
-    {
-        Debug.Log("Fell off map! Rewinding 2 seconds...");
-
-        // 1. Move player to the old position
-        transform.position = _respawnPosition;
-
-        // 2. KILL VELOCITY (Important! Otherwise you keep falling at high speed)
-        _rb.linearVelocity = Vector3.zero;
-        _rb.angularVelocity = Vector3.zero;
-
-        // 3. Clear history so we don't accidentally respawn back into the void immediately
-        _positionHistory.Clear();
-        
-        // Reset respawn point to current spot so we don't glitch
-        _respawnPosition = transform.position;
     }
 
     bool IsGrounded()

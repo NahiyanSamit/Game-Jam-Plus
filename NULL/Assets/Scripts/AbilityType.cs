@@ -5,5 +5,6 @@ public enum AbilityType
     CharacterArt,
     Texture,
     Animation,
-    UI
+    UI,
+    Punch
 }
