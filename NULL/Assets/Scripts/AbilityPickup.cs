@@ -2,17 +2,42 @@ using UnityEngine;
 
 public class AbilityPickup : MonoBehaviour
 {
-    public AbilityType abilityToUnlock; // Select 'Jump' or 'Camera' in Inspector
+    public AbilityType abilityToUnlock; 
     public GameObject pickupEffect;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            // Unlock the ability in the central Manager
+            // 1. Unlock in GameManager
             GameManager.Instance.UnlockAbility(abilityToUnlock);
 
-            // Visuals
+            // 2. Update Visuals
+            FunManager.Instance.AddFun(5f);
+            PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
+
+            if (visuals != null)
+            {
+                // A. Unlock Static Model
+                if (abilityToUnlock == AbilityType.CharacterArt)
+                {
+                    visuals.UnlockArtModel(); 
+                }
+                
+                // B. Unlock Texture
+                if (abilityToUnlock == AbilityType.Texture)
+                {
+                    visuals.UnlockTexture();
+                }
+
+                // C. Unlock Animation (Main Character)
+                if (abilityToUnlock == AbilityType.Animation)
+                {
+                    visuals.UnlockAnimationModel();
+                }
+            }
+
+            // 3. Pickup Effect
             if (pickupEffect != null)
                 Instantiate(pickupEffect, transform.position, Quaternion.identity);
 

@@ -11,5 +11,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 00043ec13cb86a840b26c4ea769c5669
+  - enabled: 1
+    path: Assets/Scenes/MassageScene.unity
+    guid: 5e1df07644e655547a2aeb1855a4c89e
+  - enabled: 1
+    path: Assets/Scenes/UIScene.unity
+    guid: 049c26e5e536ca14a8d8ceee620072c3
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
