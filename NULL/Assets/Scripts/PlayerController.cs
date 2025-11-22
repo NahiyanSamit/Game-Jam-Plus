@@ -3,18 +3,17 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
-    // Drag your Main Camera (with CameraFollow script) here in the Inspector
     public CameraFollow gameCamera; 
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    public float turnSpeed = 15f; // Controls rotation smoothness
     public float jumpForce = 8f;
 
     private Rigidbody _rb;
     private float _distToGround;
     private bool _jumpRequest; 
     
-    // Internal flag to ensure we only activate the camera once
     private bool _isCameraActive = false;
 
     void Start()
@@ -25,10 +24,9 @@ public class PlayerController : MonoBehaviour
     
     void Update()
     {
-        // --- Safety Check for GameManager ---
         if (GameManager.Instance == null) return;
 
-        // --- 1. JUMP LOGIC ---
+        // --- JUMP LOGIC ---
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
@@ -40,21 +38,18 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("You haven't unlocked Jump yet!");
             }
         }
-
-        // --- 2. CAMERA LOGIC ---
-        // If we have the ability, but haven't turned on the camera yet...
+        
         if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
         {
             if (gameCamera != null)
             {
-                // Tell the camera to start following THIS player
                 gameCamera.StartFollowing(transform);
                 _isCameraActive = true; 
                 Debug.Log("Camera activated!");
             }
             else
             {
-                Debug.LogWarning("Camera ability unlocked, but 'Game Camera' is not assigned in PlayerController!");
+                Debug.LogWarning("Camera ability unlocked, but 'Game Camera' is not assigned!");
             }
         }
     }
@@ -64,11 +59,22 @@ public class PlayerController : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        Vector3 movement = new Vector3(horizontalInput, 0f, verticalInput) * moveSpeed;
-
+        Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
+        
+        Vector3 movement = inputVector * moveSpeed;
         Vector3 targetPos = _rb.position + movement * Time.fixedDeltaTime;
         _rb.MovePosition(targetPos);
 
+        // 2. Rotate Smoothly
+        if (inputVector.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(inputVector);
+            
+            Quaternion nextRotation = Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
+            
+            _rb.MoveRotation(nextRotation);
+        }
+        
         if (_jumpRequest)
         {
             _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);

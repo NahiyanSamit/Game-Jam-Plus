@@ -15,16 +15,22 @@ public class AbilityPickup : MonoBehaviour
 
             if (visuals != null)
             {
-                // Unlock the Model
+                // 1. Unlock Art Model
                 if (abilityToUnlock == AbilityType.CharacterArt)
                 {
                     visuals.UpdateVisuals(true); 
                 }
                 
-                // Unlock the Texture
+                // 2. Unlock Texture
                 if (abilityToUnlock == AbilityType.Texture)
                 {
                     visuals.UpdateTexture(true);
+                }
+
+                // 3. Unlock Animation (NEW)
+                if (abilityToUnlock == AbilityType.Animation)
+                {
+                    visuals.EnableAnimation(true);
                 }
             }
 
