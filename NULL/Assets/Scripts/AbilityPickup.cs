@@ -10,7 +10,7 @@ public class AbilityPickup : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             GameManager.Instance.UnlockAbility(abilityToUnlock);
-            
+            FunManager.Instance.AddFun(5f);
             PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
 
             if (visuals != null)

@@ -7,5 +7,6 @@ public class SceneLoader : MonoBehaviour
     {
         
         SceneManager.LoadSceneAsync("MassageScene", LoadSceneMode.Additive);
+        SceneManager.LoadSceneAsync("UIScene", LoadSceneMode.Additive);
     }
 }
