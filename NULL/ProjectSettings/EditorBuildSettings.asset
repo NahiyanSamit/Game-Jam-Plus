@@ -17,5 +17,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/UIScene.unity
     guid: 049c26e5e536ca14a8d8ceee620072c3
+  - enabled: 1
+    path: Assets/Scenes/DemoScene_BridgesPack.unity
+    guid: 87885fbba7363e045bd85c381ac25628
+  - enabled: 1
+    path: Assets/Scenes/CombatScene.unity
+    guid: e23dc803a404de6418cb66235ac9eca9
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
