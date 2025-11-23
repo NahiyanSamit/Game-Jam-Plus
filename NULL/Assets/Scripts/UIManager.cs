@@ -32,6 +32,8 @@ public class UIManager : MonoBehaviour
 
         // 2. Initialize Coin Text to 0
         UpdateCoinDisplay(0);
+
+        exitButton.AssignAction(ExitGame);
     }
 
     // Function to turn the UI on (called by AbilityPickup)
@@ -58,6 +60,12 @@ public class UIManager : MonoBehaviour
     public bool HasEnoughCoins(int required)
     {
         return coin >= required;
+    }
+
+    public void ExitGame()
+    {
+        Debug.Log("GameExit");
+        Application.Quit();
     }
 
     public void UnlockSound()

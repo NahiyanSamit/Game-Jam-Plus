@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 using System.Collections;
 
 public class IconButton : MonoBehaviour, IPointerClickHandler
@@ -10,7 +11,7 @@ public class IconButton : MonoBehaviour, IPointerClickHandler
 
     private RectTransform rect;
     private Image image;
-
+    private Action customAction;
     void Awake()
     {
         rect = GetComponent<RectTransform>();
@@ -19,6 +20,11 @@ public class IconButton : MonoBehaviour, IPointerClickHandler
         // Gray look when locked
         if (!isUnlocked)
             image.color = new Color(0.6f, 0.6f, 0.6f);
+    }
+
+    public void AssignAction(Action action)   
+    {
+        customAction = action;
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -30,9 +36,17 @@ public class IconButton : MonoBehaviour, IPointerClickHandler
             return;
         }
 
+        if (customAction != null)
+        {
+            customAction.Invoke();
+            return;
+        }
+
         // Open the UI panel normally
         if (Panel != null)
             Panel.SetActive(!Panel.activeSelf);
+
+
 
     }
 
@@ -53,7 +67,7 @@ public class IconButton : MonoBehaviour, IPointerClickHandler
         // Small shake animation
         for (int i = 0; i < 6; i++)
         {
-            rect.localPosition = original + new Vector3(Random.Range(-5f, 5f), 0, 0);
+            rect.localPosition = original + new Vector3(UnityEngine.Random.Range(-5f, 5f), 0, 0);
             yield return new WaitForSeconds(0.03f);
         }
 

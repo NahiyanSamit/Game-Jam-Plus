@@ -1211,6 +1211,7 @@ MonoBehaviour:
   targetBox: {fileID: 4828315445566218531, guid: fa74f80562339b740a32f14c87e9dfd2,
     type: 3}
   distanceText: {fileID: 1831372365}
+  requiredCoin: 50
 --- !u!1 &421536089
 GameObject:
   m_ObjectHideFlags: 0
