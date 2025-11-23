@@ -10,5 +10,6 @@ public enum AbilityType
     Sound,
     Settings,
     Exit,
-    Gun 
+    Gun,
+    Brightness
 }
