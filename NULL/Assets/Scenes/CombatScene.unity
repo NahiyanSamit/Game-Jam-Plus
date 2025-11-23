@@ -81352,7 +81352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0d02023cb543b44978f45176f3fab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityToUnlock: 8
+  abilityToUnlock: 10
   pickupEffect: {fileID: 0}
 --- !u!65 &2051899883
 BoxCollider:
@@ -81388,7 +81388,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunPrice: 5
-  abilityToUnlock: 8
+  abilityToUnlock: 10
   tableGunModel: {fileID: 0}
 --- !u!1 &2054731732
 GameObject:
