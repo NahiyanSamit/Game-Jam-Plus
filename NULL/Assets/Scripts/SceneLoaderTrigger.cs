@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SceneLoaderTrigger : MonoBehaviour
 {
@@ -6,6 +6,7 @@ public class SceneLoaderTrigger : MonoBehaviour
     public string sceneName;           // Name of scene to load (e.g., "Level2")
     public Vector3 playerSpawnPoint;   // Where should the player go? (e.g. 0, 2, 0)
     public bool shouldHideMainLevel;   // Check TRUE only for the very first trigger
+    
 
     void OnTriggerEnter(Collider other)
     {
@@ -14,8 +15,9 @@ public class SceneLoaderTrigger : MonoBehaviour
             if (SceneController.Instance != null)
             {
                 SceneController.Instance.LoadNextLevel(sceneName, playerSpawnPoint, shouldHideMainLevel);
-                Destroy(gameObject); // Remove this trigger so we don't hit it again
+                Destroy(gameObject); 
             }
         }
+
     }
 }

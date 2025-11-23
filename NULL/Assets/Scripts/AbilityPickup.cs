@@ -20,7 +20,7 @@ public class AbilityPickup : MonoBehaviour
             // 2. Add Fun Points
             // ------------------------------------------------------------
             if (FunManager.Instance != null)
-                FunManager.Instance.AddFun(5f);
+                FunManager.Instance.AddFun(10f);
 
             // ------------------------------------------------------------
             // 3. Update Visuals (Art, Texture, Animation)
@@ -68,5 +68,25 @@ public class AbilityPickup : MonoBehaviour
 
             Destroy(gameObject);
         }
+
+        // SOUND ability
+        if (abilityToUnlock == AbilityType.Sound)
+        {
+            UIManager.Instance.UnlockSound();
+        }
+
+        // SETTINGS ability
+        if (abilityToUnlock == AbilityType.Settings)
+        {
+            UIManager.Instance.UnlockSettings();
+        }
+
+        // EXIT ability
+        if (abilityToUnlock == AbilityType.Exit)
+        {
+            UIManager.Instance.UnlockExit();
+        }
+
     }
+
 }

@@ -8,10 +8,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Panels")]
     public GameObject mainUIPanel; // Drag your 'SoundPanel' or 'GamePanel' here
+    public IconButton soundButton;
+    public IconButton settingsButton;
+    public IconButton exitButton;
 
     [Header("Text Elements")]
     public TMP_Text coinText; // <--- NEW: Drag your Coin Text object here
 
+    public int coin = 0;
     void Awake()
     {
         // Singleton setup
@@ -46,7 +50,29 @@ public class UIManager : MonoBehaviour
     {
         if (coinText != null)
         {
+            coin += coins;
             coinText.text = "COINS: " + coins.ToString();
         }
     }
+
+    public bool HasEnoughCoins(int required)
+    {
+        return coin >= required;
+    }
+
+    public void UnlockSound()
+    {
+        soundButton.SetUnlocked(true);
+    }
+
+    public void UnlockSettings()
+    {
+        settingsButton.SetUnlocked(true);
+    }
+
+    public void UnlockExit()
+    {
+        exitButton.SetUnlocked(true);
+    }
+
 }

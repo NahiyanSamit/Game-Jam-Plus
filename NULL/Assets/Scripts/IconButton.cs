@@ -5,7 +5,8 @@ using System.Collections;
 
 public class IconButton : MonoBehaviour, IPointerClickHandler
 {
-    public bool isUnlocked = false;   
+    public bool isUnlocked = false;
+    public GameObject Panel;
 
     private RectTransform rect;
     private Image image;
@@ -29,8 +30,20 @@ public class IconButton : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        // If unlocked later — you put real actions here
-        Debug.Log("Button works now!");
+        // Open the UI panel normally
+        if (Panel != null)
+            Panel.SetActive(!Panel.activeSelf);
+
+    }
+
+    public void SetUnlocked(bool value)
+    {
+        isUnlocked = value;
+
+        if (value)
+            image.color = Color.white;     // restore color
+        else
+            image.color = new Color(0.6f, 0.6f, 0.6f);
     }
 
     IEnumerator ShakeLockedIcon()

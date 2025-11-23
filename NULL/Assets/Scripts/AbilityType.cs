@@ -8,5 +8,7 @@ public enum AbilityType
     UI,
     Punch,
     Sound,
+    Settings,
+    Exit,
     Gun 
 }
