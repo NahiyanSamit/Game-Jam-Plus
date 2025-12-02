@@ -7,9 +7,15 @@ public class BrightnessManager : MonoBehaviour
 
     [Range(0f, 2f)]
     [SerializeField] private float brightness = 0f;
-
+    [SerializeField] private GameObject brightnessObject;
+    [SerializeField] private GameObject brightnessUI;
     private Light[] directionalLights;
 
+    public float Brightness
+    {
+        get => brightness;
+        set => brightness = value;
+    }
     void Awake()
     {
         if (Instance == null)
@@ -65,5 +71,18 @@ public class BrightnessManager : MonoBehaviour
     public float GetBrightness()
     {
         return brightness;
+    }
+
+    public void BrightnessIconActive()
+    {
+        brightnessObject.gameObject.SetActive(true);
+    }
+    public void BrightnessUIACtive()
+    {
+        brightnessUI.gameObject.SetActive(true);
+    }
+    public void BrightnessUIDeActive()
+    {
+        brightnessUI.gameObject.SetActive(false);
     }
 }

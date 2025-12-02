@@ -4,7 +4,6 @@ public class AbilityPickup : MonoBehaviour
 {
     public AbilityType abilityToUnlock; 
     public GameObject pickupEffect;
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -59,6 +58,22 @@ public class AbilityPickup : MonoBehaviour
                     Debug.LogWarning("SoundManager is missing from the scene!");
                 }
             }
+            // ------------------------------------------------------------
+            // 5. NEW: Enable Brightness Controls
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Brightness)
+            {
+                if (BrightnessManager.Instance != null)
+                {
+                    BrightnessManager.Instance.BrightnessIconActive();
+
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
+
 
             // ------------------------------------------------------------
             // 6. Effect & Destroy
