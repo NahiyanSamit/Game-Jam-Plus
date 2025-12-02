@@ -15,10 +15,12 @@ public class BrightnessUi : MonoBehaviour
     void Update()
     {
         GetTheSliderValue();
+        
     }
 
     public void GetTheSliderValue()
     {
-        brightnessManager.Brightness = brightnessSlider.value;
+        // brightnessManager.Brightness = brightnessSlider.value;
+        brightnessManager.SetBrightness(brightnessSlider.value);
     }
 }
