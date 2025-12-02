@@ -10,6 +10,11 @@ public class BrightnessManager : MonoBehaviour
 
     private Light[] directionalLights;
 
+    public float Brightness
+    {
+        get => brightness;
+        set => brightness = value;
+    }
     void Awake()
     {
         if (Instance == null)
