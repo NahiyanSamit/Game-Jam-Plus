@@ -24,11 +24,15 @@ public class GunShopItem : MonoBehaviour
             // 2. Check if we have 50 coins
             if (GameManager.Instance.coinCount >= gunPrice)
             {
+                GetComponent<Collider>().isTrigger = true; 
                 BuyGun();
             }
             else
             {
+               GetComponent<Collider>().isTrigger = false; 
                 Debug.Log("Not enough cash! Need " + gunPrice);
+                
+                
             }
         }
     }

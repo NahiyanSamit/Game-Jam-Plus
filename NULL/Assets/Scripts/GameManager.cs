@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -8,16 +9,30 @@ public class GameManager : MonoBehaviour
 
     [Header("Economy")]
     public int coinCount = 0;
-    public int gunPrice = 5; // Gun costs 5 coins
-
+    public int gunPrice = 50; // Gun costs 5 coins
+    [SerializeField] private GameObject rifle;
     void Awake()
     {
+        if(rifle == null)
+            rifle = GameObject.FindGameObjectWithTag("Rifle");
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else Destroy(gameObject);
+       
+    }
+
+    private void Update()
+    {
+        if (rifle == null)
+        {
+            rifle = GameObject.FindGameObjectWithTag("Rifle");
+
+        }
+
+
     }
 
     public void UnlockAbility(AbilityType ability)
@@ -49,6 +64,7 @@ public class GameManager : MonoBehaviour
     {
         if (coinCount >= gunPrice)
         {
+            rifle.gameObject.GetComponent<BoxCollider>().enabled = true;
             coinCount -= gunPrice;
             UnlockAbility(AbilityType.Gun);
             
@@ -59,7 +75,10 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            rifle.gameObject.GetComponent<Collider>().isTrigger= false;
+            rifle.gameObject.GetComponent<BoxCollider>().enabled = false;
             Debug.Log("Not enough coins! Need " + gunPrice);
+            
         }
     }
 }
