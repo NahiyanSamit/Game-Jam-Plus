@@ -1294,7 +1294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unlockedAbilities: 
   coinCount: 0
-  gunPrice: 5
+  gunPrice: 50
 --- !u!114 &419932453
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -74,6 +74,21 @@ public class AbilityPickup : MonoBehaviour
                 }
             }
 
+            // ------------------------------------------------------------
+            // 5. NEW: Buy Gun 
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Gun)
+            {
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.BuyGun();
+
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
 
             // ------------------------------------------------------------
             // 6. Effect & Destroy
