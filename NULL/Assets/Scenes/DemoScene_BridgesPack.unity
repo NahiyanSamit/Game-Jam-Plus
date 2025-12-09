@@ -7984,13 +7984,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.01
+      value: 0.055
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
@@ -8000,12 +8005,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
@@ -8020,7 +8025,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
@@ -8032,10 +8037,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b3208a43dbd7a9440a4d9e083043bab9,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 20360771f37e4254283e1bfe37eb943a, type: 2}
     - target: {fileID: 919132149155446097, guid: b3208a43dbd7a9440a4d9e083043bab9,
         type: 3}
       propertyPath: m_Name
       value: PcWormVirus_version03
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b3208a43dbd7a9440a4d9e083043bab9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9418,6 +9433,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1345881363}
+  - component: {fileID: 1345881364}
+  - component: {fileID: 1345881365}
   m_Layer: 0
   m_Name: WormPCVirus
   m_TagString: Untagged
@@ -9434,13 +9451,50 @@ Transform:
   m_GameObject: {fileID: 1345881362}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 56.097, y: 0.45389, z: -26.72297}
+  m_LocalPosition: {x: 56.097, y: 0.5, z: -26.72297}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1089395185}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!195 &1345881364
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1345881362}
+  m_Enabled: 1
+  m_AgentTypeID: -1372625422
+  m_Radius: 0.5
+  m_Speed: 0.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.68
+  m_BaseOffset: -0.11
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &1345881365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1345881362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83822b8492123ab419582c984206f514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaseRange: 20
+  nearbyDistance: 5
+  HeartLevel: 5
 --- !u!1001 &1367933633
 PrefabInstance:
   m_ObjectHideFlags: 0
