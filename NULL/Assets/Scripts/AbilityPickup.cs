@@ -82,7 +82,10 @@ public class AbilityPickup : MonoBehaviour
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.BuyGun();
-
+                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
+                    {
+                        return;
+                    }
                 }
                 else
                 {

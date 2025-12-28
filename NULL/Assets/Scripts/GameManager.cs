@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -39,7 +38,20 @@ public class GameManager : MonoBehaviour
     {
         if (!unlockedAbilities.Contains(ability))
         {
+            if(ability== AbilityType.Gun && coinCount<=50)
+            {
+                return;
+            }
             unlockedAbilities.Add(ability);
+            Debug.Log("Unlocked: " + ability);
+        }
+    }
+    
+    public void LockAbility(AbilityType ability)
+    {
+        if (unlockedAbilities.Contains(ability))
+        {
+            unlockedAbilities.Remove(ability);
         }
     }
 
@@ -62,23 +74,18 @@ public class GameManager : MonoBehaviour
     // --- NEW: SHOP SYSTEM ---
     public void BuyGun()
     {
-        if (coinCount >= gunPrice)
+        if(coinCount<gunPrice)
         {
-            rifle.gameObject.GetComponent<BoxCollider>().enabled = true;
-            coinCount -= gunPrice;
-            UnlockAbility(AbilityType.Gun);
-            
-            if (UIManager.Instance != null) 
-                UIManager.Instance.UpdateCoinDisplay(coinCount);
-                
-            Debug.Log("Gun Purchased!");
+            Debug.Log("Not enough cash! Need " + gunPrice);
+            return;
         }
-        else
-        {
-            rifle.gameObject.GetComponent<Collider>().isTrigger= false;
-            rifle.gameObject.GetComponent<BoxCollider>().enabled = false;
-            Debug.Log("Not enough coins! Need " + gunPrice);
-            
-        }
+        rifle.gameObject.GetComponent<BoxCollider>().enabled = true;
+        coinCount -= gunPrice;
+        UnlockAbility(AbilityType.Gun);
+        if (UIManager.Instance != null) 
+            UIManager.Instance.UpdateCoinDisplay(coinCount);
+        
+        Debug.Log("Gun Purchased!");
+        Debug.Log("Coins: " + coinCount);
     }
 }
