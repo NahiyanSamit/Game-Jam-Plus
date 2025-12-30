@@ -2,14 +2,14 @@ public enum AbilityType
 {
     Jump,
     Camera,
-    CharacterArt,
-    Texture,
-    Animation,
-    UI,
     Punch,
+    Gun,
+    UI,
     Sound,
+    Brightness,
     Settings,
     Exit,
-    Gun,
-    Brightness
+    CharacterArt,
+    Texture,
+    Animation
 }

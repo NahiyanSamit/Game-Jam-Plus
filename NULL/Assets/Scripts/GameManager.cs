@@ -4,55 +4,41 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    [Header("Abilities")]
     public List<AbilityType> unlockedAbilities = new List<AbilityType>();
 
     [Header("Economy")]
-    public int coinCount = 0;
-    public int gunPrice = 50; // Gun costs 5 coins
-    [SerializeField] private GameObject rifle;
+    public int coinCount;
+    public int gunPrice = 50;
+
     void Awake()
     {
-        if(rifle == null)
-            rifle = GameObject.FindGameObjectWithTag("Rifle");
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else Destroy(gameObject);
-       
-    }
-
-    private void Update()
-    {
-        if (rifle == null)
+        else
         {
-            rifle = GameObject.FindGameObjectWithTag("Rifle");
-
+            Destroy(gameObject);
         }
-
-
     }
+
+    // ================= ABILITIES =================
 
     public void UnlockAbility(AbilityType ability)
     {
-        if (!unlockedAbilities.Contains(ability))
-        {
-            if(ability== AbilityType.Gun && coinCount<=50)
-            {
-                return;
-            }
-            unlockedAbilities.Add(ability);
-            Debug.Log("Unlocked: " + ability);
-        }
+        if (unlockedAbilities.Contains(ability)) return;
+
+        unlockedAbilities.Add(ability);
+        Debug.Log("Unlocked Ability: " + ability);
     }
-    
+
     public void LockAbility(AbilityType ability)
     {
         if (unlockedAbilities.Contains(ability))
-        {
             unlockedAbilities.Remove(ability);
-        }
     }
 
     public bool HasAbility(AbilityType ability)
@@ -60,32 +46,41 @@ public class GameManager : MonoBehaviour
         return unlockedAbilities.Contains(ability);
     }
 
-    // --- NEW: COIN SYSTEM ---
+    // ================= ECONOMY =================
+
     public void AddCoin(int amount)
     {
         coinCount += amount;
-        Debug.Log("Coins: " + coinCount);
-        
-        // Update UI
-        if (UIManager.Instance != null) 
+
+        if (UIManager.Instance != null)
             UIManager.Instance.UpdateCoinDisplay(coinCount);
+
+        Debug.Log("Coins: " + coinCount);
     }
 
-    // --- NEW: SHOP SYSTEM ---
-    public void BuyGun()
+    // ================= SHOP =================
+
+    public bool BuyGun()
     {
-        if(coinCount<gunPrice)
+        if (HasAbility(AbilityType.Gun))
         {
-            Debug.Log("Not enough cash! Need " + gunPrice);
-            return;
+            Debug.Log("Gun already owned.");
+            return false;
         }
-        rifle.gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        if (coinCount < gunPrice)
+        {
+            Debug.Log("Not enough coins! Need: " + gunPrice);
+            return false;
+        }
+
         coinCount -= gunPrice;
         UnlockAbility(AbilityType.Gun);
-        if (UIManager.Instance != null) 
+
+        if (UIManager.Instance != null)
             UIManager.Instance.UpdateCoinDisplay(coinCount);
-        
-        Debug.Log("Gun Purchased!");
-        Debug.Log("Coins: " + coinCount);
+
+        Debug.Log("Gun Purchased! Remaining coins: " + coinCount);
+        return true;
     }
 }
