@@ -18,65 +18,65 @@ public class BotnetEnemy : MonoBehaviour
 
     private float nextAttackTime;
     private bool playerDetected;
-    private bool isDead;
-
+    private Enemy _enemyScript;
     void Awake()
     {
         enemy = GetComponent<Enemy>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        _enemyScript = GetComponent<Enemy>();
+        agent.stoppingDistance = 2f;
+        agent.isStopped = true;
     }
 
     void Update()
     {
-        if (isDead) return;
         if (enemy == null || enemy.Player == null) return;
-
-        float distance = enemy.Distance;
-
-        // Detect player
-        if (!playerDetected && distance <= detectionDistance)
+        
+        if (_enemyScript.DeathTrigger)
         {
-            playerDetected = true;
-            agent.isStopped = false; // IMPORTANT
+            agent.isStopped = true;
+            animator.SetTrigger("Death");
         }
-
-        // Idle until detected
-        if (!playerDetected)
+        else
         {
-            HandleIdle();
-            return;
-        }
+            float distance = enemy.Distance;
 
-        // Move first
-        HandleRun();
+            // 🔹 Detect player once
+            if (!playerDetected && distance <= detectionDistance)
+            {
+                playerDetected = true;
+                agent.isStopped = false;
+            }
 
-        // Attack only AFTER reaching target
-        if (HasReachedTarget())
-        {
-            HandleAttack();
+            // 🔹 Idle
+            if (!playerDetected)
+            {
+                HandleIdle();
+                return;
+            }
+
+            // 🔹 Chase
+            agent.SetDestination(enemy.Player.transform.position);
+            animator.SetBool("Run", true);
+
+            // 🔹 Attack only when agent stops
+            if (HasReachedTarget())
+            {
+                HandleAttack();
+            }
         }
     }
 
-    // ================= STATES =================
+    // ===== STATES =====
 
-    void HandleIdle()
+    private void HandleIdle()
     {
         agent.isStopped = true;
         animator.SetBool("Run", false);
     }
 
-    void HandleRun()
-    {
-         animator.SetBool("Run", true);
-        agent.speed = 4.5f;
-        agent.isStopped = false;
-        agent.SetDestination(enemy.Player.transform.position);
-
-       
-    }
-
-    void HandleAttack()
+    private void HandleAttack()
     {
         agent.isStopped = true;
         animator.SetBool("Run", false);
@@ -88,13 +88,13 @@ public class BotnetEnemy : MonoBehaviour
         animator.SetTrigger(Random.value > 0.5f ? "Attack01" : "Attack02");
     }
 
-    // ================= HELPERS =================
+    // ===== HELPERS =====
 
-    bool HasReachedTarget()
+    private bool HasReachedTarget()
     {
-        if (!agent.hasPath) return false;
         if (agent.pathPending) return false;
+        if (!agent.hasPath) return false;
 
-        return agent.remainingDistance <= agent.stoppingDistance;
+        return agent.remainingDistance <= agent.stoppingDistance + 0.1f;
     }
 }

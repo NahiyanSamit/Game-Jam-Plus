@@ -5,11 +5,11 @@ public class EnemyHealthBar : MonoBehaviour
 {
     [SerializeField] private Slider slider;
     [SerializeField] private Health health;
-    private Camera cam;
+    //private Camera cam;
 
     void Start()
     {
-        cam = Camera.main;
+        //cam = Camera.main;
         slider.maxValue = health.MaxHealth;
         slider.value = health.CurrentHealth;
     }
@@ -17,6 +17,6 @@ public class EnemyHealthBar : MonoBehaviour
     void Update()
     {
         slider.value = health.CurrentHealth;
-        transform.forward = cam.transform.forward;
+       // transform.forward = cam.transform.forward;
     }
 }

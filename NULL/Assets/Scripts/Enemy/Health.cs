@@ -7,7 +7,7 @@ public class Health : MonoBehaviour
 
     public int CurrentHealth => currentHealth;
     public int MaxHealth => maxHealth;
-
+    
     void Awake()
     {
         currentHealth = maxHealth;
@@ -18,9 +18,5 @@ public class Health : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        if (currentHealth <= 0)
-        {
-            Destroy(gameObject);
-        }
     }
 }

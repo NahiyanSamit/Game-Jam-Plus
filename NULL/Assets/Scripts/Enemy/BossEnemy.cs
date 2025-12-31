@@ -10,13 +10,13 @@ public class BossEnemy : MonoBehaviour
     [SerializeField] private Transform launchPoint;
     [SerializeField] private float launchForce = 20f;
     [SerializeField] private float attackCooldown = 1.5f;
-
     private float nextAttackTime;
-
+    private Enemy _enemyScript;
     void Awake()
     {
         enemy = GetComponent<Enemy>();
         animator = GetComponent<Animator>();
+        _enemyScript = GetComponent<Enemy>();
     }
 
     void Update()
@@ -28,6 +28,11 @@ public class BossEnemy : MonoBehaviour
         if (playerInRange && Time.time >= nextAttackTime)
         {
             StartAttack();
+        }
+
+        if (_enemyScript.DeathTrigger)
+        {
+            animator.SetTrigger("Death");
         }
     }
 

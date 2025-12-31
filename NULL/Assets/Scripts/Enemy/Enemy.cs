@@ -8,16 +8,21 @@ public class Enemy : MonoBehaviour
     [SerializeField]private float movementSpeed;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private int health;
-
+    private Health healthScript;
     [SerializeField] private float maxDistance = 20f;
     [SerializeField] private float distance;
-
+    private bool deathTrigger = false;
     public float Distance
     {
         get => distance;
         set => distance = value;
     }
 
+    public bool DeathTrigger
+    {
+        get => deathTrigger;
+        set => deathTrigger = value;
+    }
     public GameObject Player
     {
         get => player;
@@ -32,6 +37,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         player= GameObject.FindGameObjectWithTag("Player");
+        healthScript= GetComponent<Health>();
     }
 
     // Update is called once per frame
@@ -55,9 +61,31 @@ public class Enemy : MonoBehaviour
     private void Death()
     {
         
-        if (health <= 0)
+        if (healthScript.CurrentHealth <= 0)
         {
+            deathTrigger = true;
             Debug.Log("Enemy will die");
+            OnDeath();
         }
+        
+    }
+    private void OnDeath()
+    {
+        Debug.Log($"{gameObject.name} died");
+
+        // OPTIONAL: disable collider
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        // OPTIONAL: stop NavMesh
+        if (TryGetComponent(out UnityEngine.AI.NavMeshAgent agent))
+            agent.isStopped = true;
+
+        // OPTIONAL: play animation
+        Animator anim = GetComponent<Animator>();
+        if (anim != null)
+            anim.SetTrigger("Die");
+
+        Destroy(gameObject, 5f);
     }
 }
