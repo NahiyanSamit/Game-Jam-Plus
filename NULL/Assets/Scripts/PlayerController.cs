@@ -142,16 +142,12 @@ public class PlayerController : MonoBehaviour
             _muzzleFlashParticles.Stop();
             _muzzleFlashParticles.Play();
         }
+        
 
         RaycastHit hit;
-
-        // 1️⃣ Ray origin = gun muzzle
-        Vector3 origin = muzzlePoint.position;
-
-        // 2️⃣ Aim direction = camera forward (ONLY direction)
-        Vector3 direction = Camera.main.transform.forward;
+        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
         
-        if (Physics.Raycast(origin, direction, out hit, shootingRange, shootableMask))
+        if (Physics.Raycast(startPos, transform.forward, out hit, shootingRange, shootableMask))
         {
             Debug.Log("Bullet lagche: " + hit.collider.gameObject.name);
 
@@ -169,7 +165,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 🔍 Visual debug
-        Debug.DrawRay(origin, direction * shootingRange, Color.red, 1f);
+        Debug.DrawRay(startPos, transform.forward * shootingRange, Color.red, 1f);
     }
 
 

@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     {
         if (!unlockedAbilities.Contains(ability))
         {
-            if(ability== AbilityType.Gun && coinCount<=50)
+            if(ability== AbilityType.Gun && coinCount<gunPrice)
             {
                 return;
             }
