@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     [Header("Respawn Settings")]
     public float fallThreshold = -10f; 
     public float historyDuration = 2.0f; 
-
+    [SerializeField] private int damage = 2;
     private Rigidbody _rb;
     private float _distToGround;
     private bool _jumpRequest; 
@@ -134,28 +134,44 @@ public class PlayerController : MonoBehaviour
 
     void ShootGun()
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(shootSound);
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFX(shootSound);
 
-        // --- CHANGE 3: Play the internal particle system ---
-        if (_muzzleFlashParticles != null) 
+        if (_muzzleFlashParticles != null)
         {
-            _muzzleFlashParticles.Stop(); 
+            _muzzleFlashParticles.Stop();
             _muzzleFlashParticles.Play();
         }
-        // ---------------------------------------------------
 
         RaycastHit hit;
-        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
-        
-        if (Physics.Raycast(startPos, transform.forward, out hit, shootingRange, shootableMask))
-        {
-            EnemyHealth enemy = hit.transform.GetComponent<EnemyHealth>();
-            if (enemy != null) enemy.TakeDamage(1);
 
-            BreakableBox box = hit.transform.GetComponent<BreakableBox>();
-            if (box != null) box.TakeDamage();
+        // 1️⃣ Ray origin = gun muzzle
+        Vector3 origin = muzzlePoint.position;
+
+        // 2️⃣ Aim direction = camera forward (ONLY direction)
+        Vector3 direction = Camera.main.transform.forward;
+        
+        if (Physics.Raycast(origin, direction, out hit, shootingRange, shootableMask))
+        {
+            Debug.Log("Bullet lagche: " + hit.collider.gameObject.name);
+
+            Health health = hit.collider.GetComponent<Health>();
+            if (health != null)
+            {
+                health.TakeDamage(damage);
+            }
+
+            BreakableBox box = hit.collider.GetComponent<BreakableBox>();
+            if (box != null)
+            {
+                box.TakeDamage();
+            }
         }
+
+        // 🔍 Visual debug
+        Debug.DrawRay(origin, direction * shootingRange, Color.red, 1f);
     }
+
 
     void PerformPunch()
     {
