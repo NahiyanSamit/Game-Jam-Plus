@@ -39,22 +39,21 @@ public class GunShopItem : MonoBehaviour
 
     void BuyGun()
     {
-        // A. Deduct 50 Coins
-        GameManager.Instance.AddCoin(-gunPrice);
-
-        // B. Tell GameManager the gun is unlocked
         // (Your PlayerController in the Main Scene is listening for this!)
         GameManager.Instance.UnlockAbility(abilityToUnlock);
 
-        // C. Hide the gun ON THE TABLE (because we bought it)
-        if (tableGunModel != null)
+        if (GameManager.Instance.HasAbility(abilityToUnlock))
         {
-            tableGunModel.SetActive(false);
+            // Hide the gun ON THE TABLE (because we bought it)
+            if (tableGunModel != null)
+            {
+                tableGunModel.SetActive(false);
+            }
+
+            // Disable this trigger so we can't buy it again
+            GetComponent<Collider>().enabled = false;
+
+            Debug.Log("Gun Purchased! Player should see it now.");
         }
-
-        // D. Disable this trigger so we can't buy it again
-        GetComponent<Collider>().enabled = false;
-
-        Debug.Log("Gun Purchased! Player should see it now.");
     }
 }
