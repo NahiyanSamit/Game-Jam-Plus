@@ -8,7 +8,7 @@ public class AbilityPickup : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        
+
         if (abilityToUnlock == AbilityType.Gun)
         {
             Debug.Log("Gun must be purchased from shop.");
@@ -17,6 +17,24 @@ public class AbilityPickup : MonoBehaviour
 
         // Unlock ability
         GameManager.Instance?.UnlockAbility(abilityToUnlock);
+
+        // 🔥 CAMERA FOLLOW TRIGGER (THIS WAS MISSING)
+        if (abilityToUnlock == AbilityType.Camera)
+        {
+            if (Camera.main != null)
+            {
+                CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
+                if (cam != null)
+                {
+                    cam.StartFollowing(other.transform);
+                    Debug.Log("Camera started following player.");
+                }
+                else
+                {
+                    Debug.LogError("CameraFollow not found on Main Camera!");
+                }
+            }
+        }
 
         // Fun points
         FunManager.Instance?.AddFun(10f);
@@ -43,7 +61,6 @@ public class AbilityPickup : MonoBehaviour
         if (abilityToUnlock == AbilityType.Exit)
             UIManager.Instance?.UnlockExit();
 
-        // Pickup VFX
         if (pickupEffect != null)
             Instantiate(pickupEffect, transform.position, Quaternion.identity);
 
