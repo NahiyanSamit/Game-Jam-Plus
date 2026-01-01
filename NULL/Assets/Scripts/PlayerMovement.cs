@@ -3,25 +3,29 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float turnSpeed = 15f;
     public float jumpForce = 8f;
 
     private Rigidbody _rb;
     private PlayerInputHandler _input;
+    private PlayerAnimationDriver _anim;
     private float _groundCheckDist;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _input = GetComponent<PlayerInputHandler>();
+        _anim = GetComponent<PlayerAnimationDriver>();
+
         _groundCheckDist = GetComponent<Collider>().bounds.extents.y;
     }
 
     void FixedUpdate()
     {
         Move();
-        Jump();
+        HandleJump();
     }
 
     void Move()
@@ -38,14 +42,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Jump()
+    void HandleJump()
     {
         if (_input.JumpPressed && IsGrounded())
         {
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
             {
                 _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+                // 🔥 THIS LINE MAKES JUMP ANIMATION WORK
+                _anim?.PlayJump();
             }
+
             _input.ConsumeJump();
         }
     }
