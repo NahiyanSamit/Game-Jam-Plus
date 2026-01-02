@@ -8,10 +8,19 @@ public class PlayerMovement : MonoBehaviour
     public float turnSpeed = 15f;
     public float jumpForce = 8f;
 
+    [Header("Sound")]
+    public AudioClip footstepSound;
+    public AudioClip jumpSound;
+    public float footstepRate = 0.4f;
+    public float footstepBlockAfterJump = 1.0f;
+
     private Rigidbody _rb;
     private PlayerInputHandler _input;
     private PlayerAnimationDriver _anim;
+
     private float _groundCheckDist;
+    private float _nextFootstepTime;
+    private float _footstepBlockUntil; 
 
     void Awake()
     {
@@ -26,12 +35,14 @@ public class PlayerMovement : MonoBehaviour
     {
         Move();
         HandleJump();
+        HandleFootsteps();
     }
 
+    // ================= MOVE =================
     void Move()
     {
-        Vector3 move = new Vector3(_input.MoveInput.x, 0, _input.MoveInput.y);
-        _rb.MovePosition(_rb.position + move * moveSpeed * Time.fixedDeltaTime);
+        Vector3 move = new Vector3(_input.MoveInput.x, 0f, _input.MoveInput.y);
+        _rb.MovePosition(_rb.position + move * (moveSpeed * Time.fixedDeltaTime));
 
         if (move.sqrMagnitude > 0.01f)
         {
@@ -42,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // ================= JUMP =================
     void HandleJump()
     {
         if (_input.JumpPressed && IsGrounded())
@@ -50,16 +62,46 @@ public class PlayerMovement : MonoBehaviour
             {
                 _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-                // 🔥 THIS LINE MAKES JUMP ANIMATION WORK
+                // 🎬 Animation
                 _anim?.PlayJump();
+
+                //  Block footsteps for 0.75s
+                _footstepBlockUntil = Time.time + footstepBlockAfterJump;
+
+                //  Jump to sound (only if unlocked)
+                if (GameManager.Instance.HasAbility(AbilityType.Sound))
+                {
+                    SoundManager.Instance?.PlaySFX(jumpSound);
+                }
             }
 
             _input.ConsumeJump();
         }
     }
 
+    // ================= FOOTSTEPS =================
+    void HandleFootsteps()
+    {
+        if (Time.time < _footstepBlockUntil) return; // block after jump
+        if (!IsGrounded()) return;
+        if (_input.MoveInput.magnitude < 0.2f) return;
+        if (Time.time < _nextFootstepTime) return;
+
+        if (GameManager.Instance.HasAbility(AbilityType.Sound))
+        {
+            SoundManager.Instance?.PlaySFX(footstepSound);
+        }
+
+        _nextFootstepTime = Time.time + footstepRate;
+    }
+
+    // ================= GROUND CHECK =================
     bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, Vector3.down, _groundCheckDist + 0.3f);
+        return Physics.Raycast(
+            transform.position,
+            Vector3.down,
+            _groundCheckDist + 0.01f
+        );
     }
 }

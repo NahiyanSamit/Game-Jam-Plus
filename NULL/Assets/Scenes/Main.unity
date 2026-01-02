@@ -2824,6 +2824,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1038663709}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1067557100 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 280022733999566872, guid: fc45b7e62abe3a34da71d3a00638f636,
+    type: 3}
+  m_PrefabInstance: {fileID: 1038663709}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1102572676
 GameObject:
   m_ObjectHideFlags: 0
@@ -6628,6 +6634,7 @@ GameObject:
   - component: {fileID: 2060188230}
   - component: {fileID: 2060188229}
   - component: {fileID: 2060188228}
+  - component: {fileID: 2060188233}
   - component: {fileID: 2060188232}
   - component: {fileID: 2060188226}
   - component: {fileID: 2060188227}
@@ -6669,6 +6676,10 @@ MonoBehaviour:
   moveSpeed: 10
   turnSpeed: 15
   jumpForce: 50
+  footstepSound: {fileID: 8300000, guid: 8e0c586341010324fadd73453569f0aa, type: 3}
+  jumpSound: {fileID: 8300000, guid: d46323e22e74e46baa241cbf48c85671, type: 3}
+  footstepRate: 0.3
+  footstepBlockAfterJump: 0.75
 --- !u!4 &2060188224
 Transform:
   m_ObjectHideFlags: 0
@@ -6882,6 +6893,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2060188233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060188219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c214967cad6bb204f8e77a7a3cff0355, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunModel: {fileID: 1067557100}
 --- !u!1 &2074441375
 GameObject:
   m_ObjectHideFlags: 0
