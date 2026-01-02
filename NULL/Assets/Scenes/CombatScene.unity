@@ -5615,6 +5615,26 @@ PrefabInstance:
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_StoppingDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7925569171001163149, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: detectionDistance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8191922734510479561, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: distance
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -47552,6 +47572,26 @@ PrefabInstance:
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_StoppingDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7925569171001163149, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: detectionDistance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8191922734510479561, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: distance
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -47875,6 +47915,31 @@ PrefabInstance:
     - target: {fileID: 6345009608167877103, guid: 142c6cc208ebee549837f0214f2e3509,
         type: 3}
       propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 7676730095866577019, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_StoppingDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7925569171001163149, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: detectionDistance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8191922734510479561, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: distance
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -83956,7 +84021,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.31666666
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: f9c060297db12be419f8d710bff722dd, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: d79277d8b8dddcb4180b2935ee23a44e, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &2078397129
 Transform:
@@ -85199,6 +85264,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMin.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7925569171001163149, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: detectionDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8191922734510479561, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: distance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8191922734510479561, guid: 142c6cc208ebee549837f0214f2e3509,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

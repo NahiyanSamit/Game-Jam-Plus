@@ -12,6 +12,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float maxDistance = 20f;
     [SerializeField] private float distance;
     private bool deathTrigger = false;
+    private bool detected = false;
+
+    public bool Detected
+    {
+        get => detected;
+        set => detected = value;
+    }
     public float Distance
     {
         get => distance;
@@ -54,6 +61,7 @@ public class Enemy : MonoBehaviour
         if (player != null && distance <= maxDistance)
         {
             transform.LookAt(player.transform);
+            detected = true;
         }
 
     }

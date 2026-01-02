@@ -5,7 +5,7 @@ public class AtomBallPower : SpikeBallPower
     [Header("Homing Settings")]
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float turnSpeed = 3f;
-
+    [SerializeField] private int damage = 4;
     protected override void Start()
     {
         base.Start();
@@ -34,4 +34,22 @@ public class AtomBallPower : SpikeBallPower
             transform.rotation = Quaternion.LookRotation(rb.linearVelocity);
         }
     }
+    
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Health playerHealth = collision.gameObject.GetComponent<Health>();
+
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+                Debug.Log("Player hit by AtomBall");
+            }
+
+            Destroy(gameObject); // destroy projectile
+        }
+    }
+    
+    
 }
