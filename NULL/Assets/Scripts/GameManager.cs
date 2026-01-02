@@ -1,44 +1,74 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
-    [Header("Abilities")]
     public List<AbilityType> unlockedAbilities = new List<AbilityType>();
+    private AbilityType _currentWeapon;
 
     [Header("Economy")]
-    public int coinCount;
-    public int gunPrice = 50;
-
+    public int coinCount = 0;
+    public int gunPrice = 50; // Gun costs 5 coins
+    [SerializeField] private GameObject rifle;
     void Awake()
     {
+        if(rifle == null)
+            rifle = GameObject.FindGameObjectWithTag("Rifle");
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        else Destroy(gameObject);
+       
     }
 
-    // ================= ABILITIES =================
+    private void Update()
+    {
+        if (rifle == null)
+        {
+            rifle = GameObject.FindGameObjectWithTag("Rifle");
+
+        }
+
+
+    }
 
     public void UnlockAbility(AbilityType ability)
     {
-        if (unlockedAbilities.Contains(ability)) return;
-
-        unlockedAbilities.Add(ability);
-        Debug.Log("Unlocked Ability: " + ability);
+        if (!unlockedAbilities.Contains(ability))
+        {
+            if(ability== AbilityType.Gun && coinCount<gunPrice)
+            {
+                return;
+            }
+            unlockedAbilities.Add(ability);
+            Debug.Log("Unlocked: " + ability);
+        }
     }
-
+    
     public void LockAbility(AbilityType ability)
     {
         if (unlockedAbilities.Contains(ability))
+        {
             unlockedAbilities.Remove(ability);
+        }
+    }
+
+    public void ChangeWeapon(AbilityType weaponType)
+    {
+        if (unlockedAbilities.Contains(weaponType))
+        {
+            Debug.Log("Equipped: " + _currentWeapon);
+            _currentWeapon = weaponType;
+        }
+    }
+    
+    public AbilityType GetCurrentWeapon()
+    {
+        return _currentWeapon;
     }
 
     public bool HasAbility(AbilityType ability)
@@ -46,41 +76,32 @@ public class GameManager : MonoBehaviour
         return unlockedAbilities.Contains(ability);
     }
 
-    // ================= ECONOMY =================
-
+    // --- NEW: COIN SYSTEM ---
     public void AddCoin(int amount)
     {
         coinCount += amount;
-
-        if (UIManager.Instance != null)
-            UIManager.Instance.UpdateCoinDisplay(coinCount);
-
         Debug.Log("Coins: " + coinCount);
+        
+        // Update UI
+        if (UIManager.Instance != null) 
+            UIManager.Instance.UpdateCoinDisplay(coinCount);
     }
 
-    // ================= SHOP =================
-
-    public bool BuyGun()
+    // --- NEW: SHOP SYSTEM ---
+    public void BuyGun()
     {
-        if (HasAbility(AbilityType.Gun))
+        if(coinCount<gunPrice)
         {
-            Debug.Log("Gun already owned.");
-            return false;
+            Debug.Log("Not enough cash! Need " + gunPrice);
+            return;
         }
-
-        if (coinCount < gunPrice)
-        {
-            Debug.Log("Not enough coins! Need: " + gunPrice);
-            return false;
-        }
-
+        rifle.gameObject.GetComponent<BoxCollider>().enabled = true;
         coinCount -= gunPrice;
         UnlockAbility(AbilityType.Gun);
-
-        if (UIManager.Instance != null)
+        if (UIManager.Instance != null) 
             UIManager.Instance.UpdateCoinDisplay(coinCount);
-
-        Debug.Log("Gun Purchased! Remaining coins: " + coinCount);
-        return true;
+        
+        Debug.Log("Gun Purchased!");
+        Debug.Log("Coins: " + coinCount);
     }
 }
