@@ -6776,7 +6776,7 @@ MonoBehaviour:
   hitOffset: {x: 0, y: 0, z: 0}
   breakableLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 264
   punchSound: {fileID: 8300000, guid: b99da9a57308d4ba1bee1cf1d9038376, type: 3}
 --- !u!114 &2060188230
 MonoBehaviour:

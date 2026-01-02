@@ -18,18 +18,25 @@ public class PlayerCombat : MonoBehaviour
     public AudioClip punchSound;
 
     private PlayerInputHandler _input;
+    private PlayerAnimationDriver _anim;
 
     void Awake()
     {
         _input = GetComponent<PlayerInputHandler>();
-        if (muzzleFlash != null) muzzleFlash.Stop();
+        _anim  = GetComponent<PlayerAnimationDriver>();
+
+        if (muzzleFlash != null)
+            muzzleFlash.Stop();
     }
 
     void Update()
     {
-        if (!_input.AttackPressed) return;
+        if (!_input.AttackPressed)
+            return;
+
         _input.ConsumeAttack();
 
+        // Prevent attacking through UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
@@ -39,12 +46,14 @@ public class PlayerCombat : MonoBehaviour
             Punch();
     }
 
+    // ================= SHOOT =================
     void Shoot()
     {
         SoundManager.Instance?.PlaySFX(shootSound);
         if (muzzleFlash) muzzleFlash.Play();
 
         Vector3 start = muzzlePoint ? muzzlePoint.position : transform.position + Vector3.up;
+
         if (Physics.Raycast(start, transform.forward, out RaycastHit hit, shootingRange, shootMask))
         {
             hit.collider.GetComponent<EnemyHealth>()?.TakeDamage(1);
@@ -52,14 +61,36 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
+    // ================= PUNCH =================
     void Punch()
     {
+        _anim?.PlayPunch();
+
+        // Sound
         SoundManager.Instance?.PlaySFX(punchSound);
 
-        Vector3 pos = transform.position + transform.forward * hitOffset.z + Vector3.up * hitOffset.y;
-        Collider[] hits = Physics.OverlapSphere(pos, punchRange, breakableLayer);
+        // Damage
+        Vector3 pos =
+            transform.position +
+            transform.forward * hitOffset.z +
+            Vector3.up * hitOffset.y;
+
+        Collider[] hits =
+            Physics.OverlapSphere(pos, punchRange, breakableLayer);
 
         foreach (var hit in hits)
             hit.GetComponent<BreakableBox>()?.TakeDamage();
+    }
+
+    // ================= DEBUG =================
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Vector3 pos =
+            transform.position +
+            transform.forward * hitOffset.z +
+            Vector3.up * hitOffset.y;
+
+        Gizmos.DrawWireSphere(pos, punchRange);
     }
 }
