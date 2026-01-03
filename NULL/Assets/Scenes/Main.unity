@@ -1829,7 +1829,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unlockedAbilities: 
   coinCount: 0
-  gunPrice: 50
+  gunPrice: 0
   rifle: {fileID: 0}
 --- !u!114 &419932453
 MonoBehaviour:
@@ -2038,19 +2038,6 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 1929746173}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &524543525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 524543521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9ecbfea013d1146a8b8ccd492da77a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 524543524}
 --- !u!1001 &710345069
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6774,11 +6761,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 825894089210680117, guid: d09631666fe189540bafc78319c9e7d6, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d09631666fe189540bafc78319c9e7d6,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 524543525}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d09631666fe189540bafc78319c9e7d6, type: 3}
 --- !u!1 &1930254805
 GameObject:

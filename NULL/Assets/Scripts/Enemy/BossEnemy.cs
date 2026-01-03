@@ -21,7 +21,8 @@ public class BossEnemy : MonoBehaviour
     }
     void Awake()
     {
-        exitPrefab.SetActive(false);
+        if(exitPrefab!=null)
+            exitPrefab.SetActive(false);
         enemy = GetComponent<Enemy>();
         animator = GetComponent<Animator>();
         _enemyScript = GetComponent<Enemy>();
@@ -41,7 +42,7 @@ public class BossEnemy : MonoBehaviour
         if (_enemyScript.DeathTrigger)
         {
             exitPrefab.SetActive(true);
-            SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.BOSSENEMYDEATH);
+            //SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.BOSSENEMYDEATH);
             animator.SetTrigger("Death");
         }
     }

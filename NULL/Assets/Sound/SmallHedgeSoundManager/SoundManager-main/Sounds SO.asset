@@ -19,7 +19,7 @@ MonoBehaviour:
     sounds:
     - {fileID: 8300000, guid: 1df1e4de9a58e11419daea7570553bb5, type: 3}
   - name: SWORDSOUND
-    volume: 0.359
+    volume: 0.4
     mixer: {fileID: 24300002, guid: 587aedb20bbaf494eb496195f38a8ab6, type: 2}
     sounds:
     - {fileID: 8300000, guid: f57b6dde49c47a84887e84158fc96fbb, type: 3}

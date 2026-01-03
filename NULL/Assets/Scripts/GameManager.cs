@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Economy")]
     public int coinCount = 0;
-    public int gunPrice = 50; // Gun costs 5 coins
+    [SerializeField]public int gunPrice = 50; // Gun costs 5 coins
     [SerializeField] private GameObject rifle;
     void Awake()
     {

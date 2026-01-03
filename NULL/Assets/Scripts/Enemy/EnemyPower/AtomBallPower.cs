@@ -52,6 +52,4 @@ public class AtomBallPower : SpikeBallPower
             Destroy(gameObject); // destroy projectile
         }
     }
-    
-    
 }
