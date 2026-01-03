@@ -1,10 +1,11 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 
 public class BossEnemy : MonoBehaviour
 {
     private Enemy enemy;
     private Animator animator;
-
+    private bool bossEnemyDead = false;
     [Header("Attack Settings")]
     [SerializeField] private GameObject[] spikeBalls; // [0] main, [1] secondary
     [SerializeField] private Transform launchPoint;
@@ -12,8 +13,16 @@ public class BossEnemy : MonoBehaviour
     [SerializeField] private float attackCooldown = 1.5f;
     private float nextAttackTime;
     private Enemy _enemyScript;
+    [SerializeField] private GameObject exitPrefab;
+    public bool BossEnemyDead
+    {
+        get => bossEnemyDead;
+        set => bossEnemyDead = value;
+    }
     void Awake()
     {
+        if(exitPrefab!=null)
+            exitPrefab.SetActive(false);
         enemy = GetComponent<Enemy>();
         animator = GetComponent<Animator>();
         _enemyScript = GetComponent<Enemy>();
@@ -32,6 +41,8 @@ public class BossEnemy : MonoBehaviour
 
         if (_enemyScript.DeathTrigger)
         {
+            exitPrefab.SetActive(true);
+            //SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.BOSSENEMYDEATH);
             animator.SetTrigger("Death");
         }
     }
