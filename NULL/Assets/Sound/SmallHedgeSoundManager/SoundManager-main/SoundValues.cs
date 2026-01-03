@@ -11,6 +11,7 @@ namespace SmallHedge.SoundManager
         PLAYERDEATH,
         MEEELEENEMYDEATH,
         PLAYERHIT,
+        PLAYERRUN,
         BOSSENEMYROAR,
     }
 }

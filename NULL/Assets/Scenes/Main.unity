@@ -1829,7 +1829,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unlockedAbilities: 
   coinCount: 0
-  gunPrice: 0
+  gunPrice: 50
   rifle: {fileID: 0}
 --- !u!114 &419932453
 MonoBehaviour:
@@ -5687,12 +5687,12 @@ PrefabInstance:
     - target: {fileID: 2626990731780345471, guid: 3fd3cfaa0b7ecaf42807c708a2265141,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2626990731780345471, guid: 3fd3cfaa0b7ecaf42807c708a2265141,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3703688145035814996, guid: 3fd3cfaa0b7ecaf42807c708a2265141,
         type: 3}
@@ -5870,7 +5870,7 @@ PrefabInstance:
     - target: {fileID: 9067877793410214511, guid: 3fd3cfaa0b7ecaf42807c708a2265141,
         type: 3}
       propertyPath: m_RenderMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

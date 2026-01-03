@@ -38,6 +38,11 @@ MonoBehaviour:
     mixer: {fileID: 0}
     sounds:
     - {fileID: 8300000, guid: 10aee9b3b36c32344b263b714adaf74d, type: 3}
+  - name: PLAYERRUN
+    volume: 1
+    mixer: {fileID: 0}
+    sounds:
+    - {fileID: 8300000, guid: 47832b56ccba5bc408b1d5aac1871746, type: 3}
   - name: BOSSENEMYROAR
     volume: 1
     mixer: {fileID: 0}
