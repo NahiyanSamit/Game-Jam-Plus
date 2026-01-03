@@ -1,3 +1,4 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -44,6 +45,7 @@ public class SpikeBallPower : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERHIT);
             Health playerHealth = collision.gameObject.GetComponent<Health>();
 
             if (playerHealth != null)

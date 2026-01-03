@@ -1,3 +1,4 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 
 public class BotnetSwords : MonoBehaviour
@@ -6,6 +7,7 @@ public class BotnetSwords : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.SWORDSOUND);
         // Check if we hit the player
         if (!other.CompareTag("Player")) return;
 

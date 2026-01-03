@@ -1,3 +1,4 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -37,6 +38,7 @@ void Update()
     if (_enemyScript.DeathTrigger)
     {
         agent.isStopped = true;
+        SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.MEEELEENEMYDEATH);
         animator.SetTrigger("Death");
         return;
     }

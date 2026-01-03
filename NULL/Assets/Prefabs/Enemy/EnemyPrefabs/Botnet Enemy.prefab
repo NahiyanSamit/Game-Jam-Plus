@@ -1983,7 +1983,7 @@ MonoBehaviour:
   rotationSpeed: 15
   health: 20
   maxDistance: 10
-  distance: 15
+  distance: 0
 --- !u!195 &7676730095866577019
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2018,9 +2018,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2a61df5a113c17498ed85ae45e10bc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 2
-  detectionDistance: 1
+  damage: 5
+  detectionDistance: 5
   attackCooldown: 1.5
+  distance: 0
 --- !u!114 &5417551265952300394
 MonoBehaviour:
   m_ObjectHideFlags: 0

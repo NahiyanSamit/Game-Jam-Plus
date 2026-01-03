@@ -1,3 +1,4 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 
 public class AtomBallPower : SpikeBallPower
@@ -39,6 +40,7 @@ public class AtomBallPower : SpikeBallPower
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERHIT);
             Health playerHealth = collision.gameObject.GetComponent<Health>();
 
             if (playerHealth != null)

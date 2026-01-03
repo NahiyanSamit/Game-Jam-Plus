@@ -216,7 +216,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Respawn() {
+   public void Respawn() {
         if (_positionHistory.Count > 0) { transform.position = _positionHistory.Peek(); _rb.linearVelocity = Vector3.zero; }
         else { transform.position = new Vector3(0, 2, 0); _rb.linearVelocity = Vector3.zero; }
     }
