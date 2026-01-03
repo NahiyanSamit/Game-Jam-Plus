@@ -90,10 +90,10 @@ public class Enemy : MonoBehaviour
         if (TryGetComponent(out UnityEngine.AI.NavMeshAgent agent))
             agent.isStopped = true;
 
-        // OPTIONAL: play animation
-        Animator anim = GetComponent<Animator>();
-        if (anim != null)
-            anim.SetTrigger("Die");
+        // // OPTIONAL: play animation
+        // Animator anim = GetComponent<Animator>();
+        // if (anim != null)
+        //     anim.SetTrigger("Die");
 
         Destroy(gameObject, 5f);
     }
