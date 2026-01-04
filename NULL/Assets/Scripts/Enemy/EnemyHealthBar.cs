@@ -16,6 +16,11 @@ public class EnemyHealthBar : MonoBehaviour
 
     void Update()
     {
+        if (health == null)
+            health = GetComponentInParent<Health>(); 
+
+        if (slider == null)
+            slider = GetComponentInChildren<Slider>();
         slider.value = health.CurrentHealth;
        // transform.forward = cam.transform.forward;
     }
