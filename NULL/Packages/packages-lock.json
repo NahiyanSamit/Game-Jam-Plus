@@ -14,7 +14,7 @@
       "dependencies": {
         "com.cysharp.unitask": "^2.5.10"
       },
-      "hash": "2354ee6d72fc56e9d5ba4eb03393ca4751a52d14"
+      "hash": "88aaf7bd735dfa34ed39947bd24ce45703f3dcfb"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
