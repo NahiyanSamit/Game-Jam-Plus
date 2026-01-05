@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using SmallHedge.SoundManager;
 using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
@@ -206,6 +207,7 @@ public class PlayerController : MonoBehaviour
         if (_jumpRequest) { _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); _jumpRequest = false; }
 
         if (inputVector.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime) {
+            //if (SoundManager.Instance != null) SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERRUN);
             if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(footstepSound);
             _nextStepTime = Time.time + footstepRate;
         }
@@ -216,7 +218,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Respawn() {
+   public void Respawn() {
         if (_positionHistory.Count > 0) { transform.position = _positionHistory.Peek(); _rb.linearVelocity = Vector3.zero; }
         else { transform.position = new Vector3(0, 2, 0); _rb.linearVelocity = Vector3.zero; }
     }

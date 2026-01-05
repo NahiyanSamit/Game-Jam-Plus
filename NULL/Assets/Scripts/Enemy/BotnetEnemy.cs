@@ -1,3 +1,4 @@
+using SmallHedge.SoundManager;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,13 +10,13 @@ public class BotnetEnemy : MonoBehaviour
     private Enemy enemy;
     private NavMeshAgent agent;
     private Animator animator;
-
+    [SerializeField] private int damage = 4;
     [Header("Detection")]
-    [SerializeField] private float detectionDistance = 10f;
+    [SerializeField] private float detectionDistance ;
 
     [Header("Attack")]
     [SerializeField] private float attackCooldown = 1.5f;
-
+    [SerializeField] private float distance;
     private float nextAttackTime;
     private bool playerDetected;
     private Enemy _enemyScript;
@@ -29,44 +30,46 @@ public class BotnetEnemy : MonoBehaviour
         agent.isStopped = true;
     }
 
-    void Update()
+void Update()
+{
+    if (enemy == null || enemy.Player == null) return;
+
+    // Death
+    if (_enemyScript.DeathTrigger)
     {
-        if (enemy == null || enemy.Player == null) return;
-        
-        if (_enemyScript.DeathTrigger)
-        {
-            agent.isStopped = true;
-            animator.SetTrigger("Death");
-        }
-        else
-        {
-            float distance = enemy.Distance;
-
-            // 🔹 Detect player once
-            if (!playerDetected && distance <= detectionDistance)
-            {
-                playerDetected = true;
-                agent.isStopped = false;
-            }
-
-            // 🔹 Idle
-            if (!playerDetected)
-            {
-                HandleIdle();
-                return;
-            }
-
-            // 🔹 Chase
-            agent.SetDestination(enemy.Player.transform.position);
-            animator.SetBool("Run", true);
-
-            // 🔹 Attack only when agent stops
-            if (HasReachedTarget())
-            {
-                HandleAttack();
-            }
-        }
+        agent.isStopped = true;
+        //SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.MEEELEENEMYDEATH);
+        animator.SetTrigger("Death");
+        return;
     }
+
+    distance = enemy.Distance;
+
+    // Detect player
+    if (!playerDetected && enemy.Detected)
+    {
+        playerDetected = true;
+        agent.isStopped = false;
+    }
+
+    // Idle
+    if (!playerDetected)
+    {
+        HandleIdle();
+        return;
+    }
+
+    // Chase
+    agent.isStopped = false;
+    agent.SetDestination(enemy.Player.transform.position);
+    animator.SetBool("Run", true);
+
+    // Attack
+    if (HasReachedTarget())
+    {
+        HandleAttack();
+    }
+}
 
     // ===== STATES =====
 
@@ -96,5 +99,20 @@ public class BotnetEnemy : MonoBehaviour
         if (!agent.hasPath) return false;
 
         return agent.remainingDistance <= agent.stoppingDistance + 0.1f;
+    }
+    
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Health playerHealth = collision.gameObject.GetComponent<Health>();
+
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+                Debug.Log("Player hit by AtomBall");
+            }
+            
+        }
     }
 }

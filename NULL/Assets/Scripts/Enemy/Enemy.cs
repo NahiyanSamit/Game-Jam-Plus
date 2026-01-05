@@ -12,6 +12,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float maxDistance = 20f;
     [SerializeField] private float distance;
     private bool deathTrigger = false;
+    private bool detected = false;
+
+    public bool Detected
+    {
+        get => detected;
+        set => detected = value;
+    }
     public float Distance
     {
         get => distance;
@@ -43,7 +50,8 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        distance = Vector3.Distance(player.transform.position, transform.position);
+        if(player!=null)
+            distance = Vector3.Distance(player.transform.position, transform.position);
         LookingAtPlayer();
         Death();
     }
@@ -54,6 +62,7 @@ public class Enemy : MonoBehaviour
         if (player != null && distance <= maxDistance)
         {
             transform.LookAt(player.transform);
+            detected = true;
         }
 
     }
@@ -81,10 +90,10 @@ public class Enemy : MonoBehaviour
         if (TryGetComponent(out UnityEngine.AI.NavMeshAgent agent))
             agent.isStopped = true;
 
-        // OPTIONAL: play animation
-        Animator anim = GetComponent<Animator>();
-        if (anim != null)
-            anim.SetTrigger("Die");
+        // // OPTIONAL: play animation
+        // Animator anim = GetComponent<Animator>();
+        // if (anim != null)
+        //     anim.SetTrigger("Die");
 
         Destroy(gameObject, 5f);
     }
