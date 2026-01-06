@@ -1,6 +1,7 @@
-using UnityEngine;
 using System.Collections.Generic;
+using DG.Tweening;
 using SmallHedge.SoundManager;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
@@ -110,6 +111,7 @@ public class PlayerController : MonoBehaviour
                 _jumpRequest = true;
                 if (characterAnimator != null) characterAnimator.SetTrigger("Jump");
                 if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(jumpSound);
+                
             }
         }
 
