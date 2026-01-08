@@ -73,6 +73,22 @@ public class AbilityPickup : MonoBehaviour
                     Debug.LogWarning("SoundManager is missing from the scene!");
                 }
             }
+            
+            if (abilityToUnlock == AbilityType.Punch)
+            {
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
+                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
 
             // ------------------------------------------------------------
             // 5. NEW: Buy Gun 
@@ -82,6 +98,7 @@ public class AbilityPickup : MonoBehaviour
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.BuyGun();
+                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
                     if (!GameManager.Instance.HasAbility(abilityToUnlock))
                     {
                         return;
