@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
 
         if (gunModel != null && !gunModel.activeSelf)
         {
-            if (GameManager.Instance.HasAbility(AbilityType.Gun))
+            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
                 gunModel.SetActive(true);
         }
 
@@ -113,15 +113,29 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (Input.GetButtonDown("Fire2"))
+        {
+            if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun && GameManager.Instance.HasAbility(AbilityType.Gun))
+            {
+                GameManager.Instance.ChangeWeapon(AbilityType.Punch);
+                gunModel.SetActive(false);
+            }
+            else if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch && GameManager.Instance.HasAbility(AbilityType.Gun))
+            {
+                GameManager.Instance.ChangeWeapon(AbilityType.Gun);
+                gunModel.SetActive(true);
+            }
+        }
+
         if (Input.GetMouseButtonDown(0)) 
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-            if (GameManager.Instance.HasAbility(AbilityType.Gun))
+            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
             {
                 ShootGun();
             }
-            else if (GameManager.Instance.HasAbility(AbilityType.Punch))
+            else if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch)
             {
                 PerformPunch();
             }
