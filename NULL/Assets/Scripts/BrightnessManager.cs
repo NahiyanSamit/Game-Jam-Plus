@@ -6,22 +6,17 @@ public class BrightnessManager : MonoBehaviour
     public static BrightnessManager Instance;
 
     [Range(0f, 2f)]
-    [SerializeField] private float brightness = 0f;
-    [SerializeField] private GameObject brightnessObject;
-    [SerializeField] private GameObject brightnessUI;
+    [SerializeField] private float brightness = 1f;
     private Light[] directionalLights;
 
-    public float Brightness
-    {
-        get => brightness;
-        set => brightness = value;
-    }
+    public float Brightness => brightness;
+
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // stay across scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -31,7 +26,7 @@ public class BrightnessManager : MonoBehaviour
 
     void OnEnable()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded; // detect scene load
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void OnDisable()
@@ -51,6 +46,12 @@ public class BrightnessManager : MonoBehaviour
         directionalLights = System.Array.FindAll(allLights, l => l.type == LightType.Directional);
     }
 
+    public void SetBrightness(float value)
+    {
+        brightness = value;
+        ApplyBrightness();
+    }
+
     private void ApplyBrightness()
     {
         if (directionalLights == null) return;
@@ -60,29 +61,5 @@ public class BrightnessManager : MonoBehaviour
             if (light != null)
                 light.intensity = brightness;
         }
-    }
-
-    public void SetBrightness(float value)
-    {
-        brightness = value;
-        ApplyBrightness();
-    }
-
-    public float GetBrightness()
-    {
-        return brightness;
-    }
-
-    public void BrightnessIconActive()
-    {
-        brightnessObject.gameObject.SetActive(true);
-    }
-    public void BrightnessUIACtive()
-    {
-        brightnessUI.gameObject.SetActive(true);
-    }
-    public void BrightnessUIDeActive()
-    {
-        brightnessUI.gameObject.SetActive(false);
     }
 }

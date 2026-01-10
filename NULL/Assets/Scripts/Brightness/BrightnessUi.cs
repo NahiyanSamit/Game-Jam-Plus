@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class BrightnessUi : MonoBehaviour
@@ -9,18 +9,22 @@ public class BrightnessUi : MonoBehaviour
     void Start()
     {
         brightnessManager = FindObjectOfType<BrightnessManager>();
+
+        // Listen to slider change
+        brightnessSlider.onValueChanged.AddListener(OnBrightnessChanged);
     }
 
-    // Update is called once per frame
-    void Update()
+    // Called when brightness icon is clicked
+    void OnBrightnessChanged(float value)
     {
-        GetTheSliderValue();
-        
-    }
+        // 🔒 Check ability before applying
+        if (!GameManager.Instance.HasAbility(AbilityType.Brightness))
+        {
+            MessageManager.Instance.ShowMessage("Item Not Found", 1.2f);
+            brightnessSlider.value = brightnessManager.Brightness; // reset
+            return;
+        }
 
-    public void GetTheSliderValue()
-    {
-        // brightnessManager.Brightness = brightnessSlider.value;
-        brightnessManager.SetBrightness(brightnessSlider.value);
+        brightnessManager.SetBrightness(value);
     }
 }

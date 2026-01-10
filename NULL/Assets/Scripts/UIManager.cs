@@ -7,15 +7,17 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     [Header("Panels")]
-    public GameObject mainUIPanel; // Drag your 'SoundPanel' or 'GamePanel' here
+    public GameObject mainUIPanel; 
     public IconButton soundButton;
     public IconButton settingsButton;
     public IconButton exitButton;
+    public IconButton brightnessIcon;
 
     [Header("Text Elements")]
-    public TMP_Text coinText; // <--- NEW: Drag your Coin Text object here
+    public TMP_Text coinText; 
 
     public int coin = 0;
+    public bool isBrightnessUnlocked = false;
     void Awake()
     {
         // Singleton setup
@@ -68,6 +70,12 @@ public class UIManager : MonoBehaviour
     public void UnlockSettings()
     {
         settingsButton.SetUnlocked(true);
+    }
+
+    public void UnlockBrightness()
+    {
+        isBrightnessUnlocked = true;
+        brightnessIcon.SetUnlocked(true);
     }
 
     public void UnlockExit()

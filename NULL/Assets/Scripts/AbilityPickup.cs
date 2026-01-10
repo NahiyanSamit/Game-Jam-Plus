@@ -65,7 +65,7 @@ public class AbilityPickup : MonoBehaviour
             {
                 if (BrightnessManager.Instance != null)
                 {
-                    BrightnessManager.Instance.BrightnessIconActive();
+                    UIManager.Instance.UnlockBrightness();
 
                 }
                 else
@@ -129,6 +129,12 @@ public class AbilityPickup : MonoBehaviour
         if (abilityToUnlock == AbilityType.Settings)
         {
             UIManager.Instance.UnlockSettings();
+        }
+
+        // BRIGHTNESS ability
+        if (abilityToUnlock == AbilityType.Brightness)
+        {
+            UIManager.Instance.UnlockBrightness();
         }
 
         // EXIT ability
