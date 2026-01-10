@@ -1,41 +1,75 @@
-using SmallHedge.SoundManager;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerDeath : MonoBehaviour
 {
-   [SerializeField] private Animator animator;
+    [Header("References")]
+    public PlayerController playerController;
+    public Animator animator;
+    public DeathContinuePanel deathPanel;
+    public Transform respawnPoint;
+
+    [Header("Settings")]
+    public float showPanelDelay = 3f;
+
     private Health health;
-    private bool isDead = false;
-    private PlayerController playerController;
+    private bool isDead;
+
     void Awake()
     {
-       
-        animator = GetComponentInChildren<Animator>();
-        playerController = GetComponentInParent<PlayerController>();
         health = GetComponent<Health>();
 
-        if (animator == null)
-            Debug.LogError("Animator not found in children!");
-        if(health == null) return;
-        if (health == null)
-            Debug.LogError("Health not found in children!");
+        if (!playerController)
+            playerController = GetComponent<PlayerController>();
+
+        if (!animator)
+            animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        CheckDeath();
+        if (isDead || health == null) return;
+
+        if (health.CurrentHealth <= 0)
+            Die();
     }
 
-    private void CheckDeath()
+    void Die()
     {
-        if (health == null || animator == null || isDead) return;
+        isDead = true;
 
-        if (!isDead && health.CurrentHealth <= 0)
-        {
-            isDead = true;
-            SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERDEATH);
+        playerController.enabled = false;
+
+        if (animator)
             animator.SetTrigger("Death");
-            playerController.Respawn();
-        }
+
+        StartCoroutine(ShowPanelAfterDelay());
+    }
+
+    IEnumerator ShowPanelAfterDelay()
+    {
+        yield return new WaitForSeconds(showPanelDelay);
+        deathPanel.Show();   
+    }
+
+    // UI BUTTON → CONTINUE
+    public void ContinueGame()
+    {
+        health.ResetHealth();  
+
+        if (respawnPoint)
+            transform.position = respawnPoint.position;
+
+        playerController.enabled = true;
+
+        deathPanel.Hide();      
+
+        isDead = false;
+    }
+
+    // UI BUTTON → QUIT
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

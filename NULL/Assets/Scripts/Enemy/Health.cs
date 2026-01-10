@@ -10,13 +10,18 @@ public class Health : MonoBehaviour
     
     void Awake()
     {
-        currentHealth = maxHealth;
+        ResetHealth(); // cleaner init
     }
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+    }
 
+    // ✅ REQUIRED BY PlayerDeath
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
     }
 }

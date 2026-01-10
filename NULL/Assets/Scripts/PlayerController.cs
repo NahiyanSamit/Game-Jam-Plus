@@ -1,26 +1,25 @@
 using UnityEngine;
 using System.Collections.Generic;
-using SmallHedge.SoundManager;
 using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
+    private static readonly int Jump = Animator.StringToHash("Jump");
+    private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int Punch1 = Animator.StringToHash("Punch");
+
     [Header("References")]
-    public CameraFollow gameCamera; 
-    public Animator characterAnimator; 
+    public CameraFollow gameCamera;
+    public Animator characterAnimator;
 
     [Header("Gun Settings")]
-    public GameObject gunModel;         
-    public Transform muzzlePoint;       
-    
-    // --- CHANGE 1: We use GameObject now, it is easier to assign ---
-    public GameObject muzzleFlashObject;  // Drag 'VFX_M4' here
-    private ParticleSystem _muzzleFlashParticles; // Internal reference
-    // ---------------------------------------------------------------
+    public GameObject gunModel;
+    public Transform muzzlePoint;
+    public GameObject muzzleFlashObject;
 
-    public float shootingRange = 20f;   
-    public LayerMask enemyLayer;        
-    private int shootableMask; 
+    public float shootingRange = 20f;
+    public LayerMask enemyLayer;
+    public LayerMask breakableLayer;
 
     [Header("Audio Clips")]
     public AudioClip jumpSound;
@@ -30,229 +29,200 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float turnSpeed = 15f; 
+    public float turnSpeed = 15f;
     public float jumpForce = 8f;
-    public float footstepRate = 0.5f; 
+    public float footstepRate = 0.5f;
 
     [Header("Punch Settings")]
-    public float punchRange = 1.5f;             
-    public Vector3 hitOffset = new Vector3(0, 1f, 1f); 
-    public LayerMask breakableLayer; 
+    public float punchRange = 1.5f;
+    public Vector3 hitOffset = new Vector3(0, 1f, 1f);
 
     [Header("Respawn Settings")]
-    public float fallThreshold = -10f; 
-    public float historyDuration = 2.0f; 
-    [SerializeField] private int damage = 2;
+    public float fallThreshold = -10f;
+    public float historyDuration = 2f;
+
+    private const int Damage = 2;
+
     private Rigidbody _rb;
     private float _distToGround;
-    private bool _jumpRequest; 
-    private bool _isCameraActive = false;
+    private bool _jumpRequest;
+    private bool _isCameraActive;
     private float _nextStepTime;
-    
-    private Vector3 _initialModelLocalPos;
-    private Quaternion _initialModelLocalRot;
+
+    private ParticleSystem _muzzleFlash;
+    private int _shootMask;
+
+    private Vector3 _initialModelPos;
+    private Quaternion _initialModelRot;
     private Queue<Vector3> _positionHistory = new Queue<Vector3>();
 
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<Collider>().bounds.extents.y;
-        shootableMask = enemyLayer | breakableLayer;
-        
+        _shootMask = enemyLayer | breakableLayer;
+
         if (characterAnimator != null)
         {
-            _initialModelLocalPos = characterAnimator.transform.localPosition;
-            _initialModelLocalRot = characterAnimator.transform.localRotation;
+            _initialModelPos = characterAnimator.transform.localPosition;
+            _initialModelRot = characterAnimator.transform.localRotation;
         }
 
-        if (gameCamera == null) gameCamera = FindFirstObjectByType<CameraFollow>();
+        if (gameCamera == null)
+            gameCamera = FindFirstObjectByType<CameraFollow>();
 
-        // --- CHANGE 2: Auto-Find the Particle System ---
         if (muzzleFlashObject != null)
         {
-            // We look for the particle component on the object you dragged in
-            _muzzleFlashParticles = muzzleFlashObject.GetComponent<ParticleSystem>();
-            
-            // Safety: Stop it from playing at the start
-            if (_muzzleFlashParticles != null) _muzzleFlashParticles.Stop(); 
+            _muzzleFlash = muzzleFlashObject.GetComponent<ParticleSystem>();
+            if (_muzzleFlash != null) _muzzleFlash.Stop();
         }
-        // -----------------------------------------------
 
         if (gunModel != null)
-        {
             gunModel.SetActive(false);
-            if (GameManager.Instance != null && GameManager.Instance.HasAbility(AbilityType.Gun))
-            {
-                gunModel.SetActive(true);
-            }
-        }
-        
-        if (MessageManager.Instance != null)
-            MessageManager.Instance.ShowMessage("Level Start!", 3f);
     }
-    
+
     void Update()
     {
         if (GameManager.Instance == null) return;
 
-        if (transform.position.y < fallThreshold) Respawn();
+        if (transform.position.y < fallThreshold)
+            Respawn();
 
-        if (gunModel != null && !gunModel.activeSelf)
+        // Enable gun if equipped
+        if (gunModel != null && !gunModel.activeSelf &&
+            GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
         {
-            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
-                gunModel.SetActive(true);
+            gunModel.SetActive(true);
         }
 
+        // Jump
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
             {
                 _jumpRequest = true;
-                if (characterAnimator != null) characterAnimator.SetTrigger("Jump");
-                if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(jumpSound);
+                characterAnimator?.SetTrigger(Jump);
+                SoundManager.Instance?.PlaySFX(jumpSound);
             }
         }
 
-        if (Input.GetButtonDown("Fire2"))
+        // Switch weapon
+        if (Input.GetButtonDown("Fire2") && GameManager.Instance.HasAbility(AbilityType.Gun))
         {
-            if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun && GameManager.Instance.HasAbility(AbilityType.Gun))
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
             {
                 GameManager.Instance.ChangeWeapon(AbilityType.Punch);
                 gunModel.SetActive(false);
             }
-            else if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch && GameManager.Instance.HasAbility(AbilityType.Gun))
+            else
             {
                 GameManager.Instance.ChangeWeapon(AbilityType.Gun);
                 gunModel.SetActive(true);
             }
         }
 
-        if (Input.GetMouseButtonDown(0)) 
+        // Attack
+        if (Input.GetMouseButtonDown(0))
         {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
 
-            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
-            {
-                ShootGun();
-            }
-            else if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch)
-            {
-                PerformPunch();
-            }
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
+                Shoot();
+            else
+                Punch();
         }
-        
+
+        // Camera ability
         if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
         {
-            if (gameCamera != null) { gameCamera.StartFollowing(transform); _isCameraActive = true; }
-        }
-    }
-
-    void ShootGun()
-    {
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(shootSound);
-
-        if (_muzzleFlashParticles != null)
-        {
-            _muzzleFlashParticles.Stop();
-            _muzzleFlashParticles.Play();
-        }
-        
-
-        RaycastHit hit;
-        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
-        
-        if (Physics.Raycast(startPos, transform.forward, out hit, shootingRange, shootableMask))
-        {
-            Debug.Log("Bullet lagche: " + hit.collider.gameObject.name);
-
-            Health health = hit.collider.GetComponent<Health>();
-            if (health != null)
-            {
-                health.TakeDamage(damage);
-            }
-
-            BreakableBox box = hit.collider.GetComponent<BreakableBox>();
-            if (box != null)
-            {
-                box.TakeDamage();
-            }
-        }
-
-        // 🔍 Visual debug
-        Debug.DrawRay(startPos, transform.forward * shootingRange, Color.red, 1f);
-    }
-
-
-    void PerformPunch()
-    {
-        if (characterAnimator != null) characterAnimator.SetTrigger("Punch");
-        if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(punchSound);
-        CheckForBreakables();
-    }
-
-    void CheckForBreakables()
-    {
-        Vector3 spherePos = transform.position + (transform.up * hitOffset.y) + (transform.forward * hitOffset.z);
-        Collider[] hitColliders = Physics.OverlapSphere(spherePos, punchRange, breakableLayer);
-        foreach (var hit in hitColliders) {
-            BreakableBox box = hit.GetComponent<BreakableBox>();
-            if (box != null) box.TakeDamage(); 
+            gameCamera?.StartFollowing(transform);
+            _isCameraActive = true;
         }
     }
 
     void FixedUpdate()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
-        
-        Vector3 movement = inputVector * moveSpeed;
-        Vector3 targetPos = _rb.position + movement * Time.fixedDeltaTime;
-        _rb.MovePosition(targetPos);
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
 
-        if (inputVector.sqrMagnitude > 0.01f) {
-            Quaternion targetRotation = Quaternion.LookRotation(inputVector);
-            Quaternion nextRotation = Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
-            _rb.MoveRotation(nextRotation);
+        Vector3 move = new Vector3(h, 0f, v);
+        _rb.MovePosition(_rb.position + move * (moveSpeed * Time.fixedDeltaTime));
+
+        if (move.sqrMagnitude > 0.01f)
+        {
+            Quaternion rot = Quaternion.LookRotation(move);
+            _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, rot, turnSpeed * Time.fixedDeltaTime));
         }
 
-        if (characterAnimator != null) characterAnimator.SetFloat("Speed", inputVector.magnitude);
-        if (_jumpRequest) { _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); _jumpRequest = false; }
+        characterAnimator?.SetFloat(Speed, move.magnitude);
 
-        if (inputVector.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime) {
-            //if (SoundManager.Instance != null) SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERRUN);
-            if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(footstepSound);
+        if (_jumpRequest)
+        {
+            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _jumpRequest = false;
+        }
+
+        if (move.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime)
+        {
+            SoundManager.Instance?.PlaySFX(footstepSound);
             _nextStepTime = Time.time + footstepRate;
         }
 
-        if (IsGrounded()) { 
-            _positionHistory.Enqueue(transform.position); 
-            if (_positionHistory.Count > (historyDuration / Time.fixedDeltaTime)) _positionHistory.Dequeue(); 
+        if (IsGrounded())
+        {
+            _positionHistory.Enqueue(transform.position);
+            if (_positionHistory.Count > historyDuration / Time.fixedDeltaTime)
+                _positionHistory.Dequeue();
         }
     }
 
-   public void Respawn() {
-        if (_positionHistory.Count > 0) { transform.position = _positionHistory.Peek(); _rb.linearVelocity = Vector3.zero; }
-        else { transform.position = new Vector3(0, 2, 0); _rb.linearVelocity = Vector3.zero; }
-    }
+    void Shoot()
+    {
+        SoundManager.Instance?.PlaySFX(shootSound);
+        _muzzleFlash?.Play();
 
-    void LateUpdate() {
-        if (characterAnimator != null) {
-            characterAnimator.transform.localPosition = _initialModelLocalPos;
-            characterAnimator.transform.localRotation = _initialModelLocalRot;
+        Vector3 start = muzzlePoint ? muzzlePoint.position : transform.position + Vector3.up;
+
+        if (Physics.Raycast(start, transform.forward, out RaycastHit hit, shootingRange, _shootMask))
+        {
+            hit.collider.GetComponent<Health>()?.TakeDamage(Damage);
+            hit.collider.GetComponent<BreakableBox>()?.TakeDamage();
         }
     }
 
-    void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        Vector3 spherePos = transform.position + (transform.up * hitOffset.y) + (transform.forward * hitOffset.z);
-        Gizmos.DrawWireSphere(spherePos, punchRange);
-        
-        Gizmos.color = Color.yellow;
-        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
-        Gizmos.DrawRay(startPos, transform.forward * shootingRange);
+    void Punch()
+    {
+        characterAnimator?.SetTrigger(Punch1);
+        SoundManager.Instance?.PlaySFX(punchSound);
+
+        Vector3 pos = transform.position + transform.forward * hitOffset.z + Vector3.up * hitOffset.y;
+        Collider[] hits = Physics.OverlapSphere(pos, punchRange, breakableLayer);
+
+        foreach (var h in hits)
+            h.GetComponent<BreakableBox>()?.TakeDamage();
     }
 
-    bool IsGrounded() { return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f); }
+    public void Respawn()
+    {
+        transform.position = _positionHistory.Count > 0
+            ? _positionHistory.Peek()
+            : new Vector3(0, 2, 0);
+
+        _rb.linearVelocity = Vector3.zero;
+    }
+
+    void LateUpdate()
+    {
+        if (characterAnimator != null)
+        {
+            characterAnimator.transform.localPosition = _initialModelPos;
+            characterAnimator.transform.localRotation = _initialModelRot;
+        }
+    }
+
+    bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
+    }
 }
