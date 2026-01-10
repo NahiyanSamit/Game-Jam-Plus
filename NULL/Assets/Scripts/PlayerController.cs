@@ -4,8 +4,8 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
-    private static readonly int Jump = Animator.StringToHash("Jump");
     private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int Jump = Animator.StringToHash("Jump");
     private static readonly int Punch1 = Animator.StringToHash("Punch");
 
     [Header("References")]
@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public Transform muzzlePoint;
     public GameObject muzzleFlashObject;
 
+    [Header("Combat Settings")]
     public float shootingRange = 20f;
     public LayerMask enemyLayer;
     public LayerMask breakableLayer;
@@ -27,29 +28,28 @@ public class PlayerController : MonoBehaviour
     public AudioClip footstepSound;
     public AudioClip shootSound;
 
-    [Header("Movement Settings")]
+    [Header("Movement")]
     public float moveSpeed = 5f;
     public float turnSpeed = 15f;
     public float jumpForce = 8f;
     public float footstepRate = 0.5f;
 
-    [Header("Punch Settings")]
+    [Header("Punch")]
     public float punchRange = 1.5f;
     public Vector3 hitOffset = new Vector3(0, 1f, 1f);
 
-    [Header("Respawn Settings")]
+    [Header("Respawn")]
     public float fallThreshold = -10f;
     public float historyDuration = 2f;
 
     private const int Damage = 2;
 
     private Rigidbody _rb;
-    private float _distToGround;
-    private bool _jumpRequest;
-    private bool _isCameraActive;
-    private float _nextStepTime;
-
     private ParticleSystem _muzzleFlash;
+    private float _groundDist;
+    private bool _jumpRequest;
+    private bool _cameraActive;
+    private float _nextStepTime;
     private int _shootMask;
 
     private Vector3 _initialModelPos;
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        _distToGround = GetComponent<Collider>().bounds.extents.y;
+        _groundDist = GetComponent<Collider>().bounds.extents.y;
         _shootMask = enemyLayer | breakableLayer;
 
         if (characterAnimator != null)
@@ -68,17 +68,16 @@ public class PlayerController : MonoBehaviour
             _initialModelRot = characterAnimator.transform.localRotation;
         }
 
-        if (gameCamera == null)
+        if (!gameCamera)
             gameCamera = FindFirstObjectByType<CameraFollow>();
 
-        if (muzzleFlashObject != null)
+        if (muzzleFlashObject)
         {
             _muzzleFlash = muzzleFlashObject.GetComponent<ParticleSystem>();
-            if (_muzzleFlash != null) _muzzleFlash.Stop();
+            _muzzleFlash?.Stop();
         }
 
-        if (gunModel != null)
-            gunModel.SetActive(false);
+        gunModel?.SetActive(false);
     }
 
     void Update()
@@ -88,92 +87,110 @@ public class PlayerController : MonoBehaviour
         if (transform.position.y < fallThreshold)
             Respawn();
 
-        // Enable gun if equipped
-        if (gunModel != null && !gunModel.activeSelf &&
-            GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
-        {
-            gunModel.SetActive(true);
-        }
+        // Enable gun only if equipped
+        gunModel?.SetActive(
+            GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun &&
+            GameManager.Instance.HasAbility(AbilityType.Gun)
+        );
 
-        // Jump
-        if (Input.GetButtonDown("Jump") && IsGrounded())
-        {
-            if (GameManager.Instance.HasAbility(AbilityType.Jump))
-            {
-                _jumpRequest = true;
-                characterAnimator?.SetTrigger(Jump);
-                SoundManager.Instance?.PlaySFX(jumpSound);
-            }
-        }
-
-        // Switch weapon
-        if (Input.GetButtonDown("Fire2") && GameManager.Instance.HasAbility(AbilityType.Gun))
-        {
-            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
-            {
-                GameManager.Instance.ChangeWeapon(AbilityType.Punch);
-                gunModel.SetActive(false);
-            }
-            else
-            {
-                GameManager.Instance.ChangeWeapon(AbilityType.Gun);
-                gunModel.SetActive(true);
-            }
-        }
-
-        // Attack
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
-                Shoot();
-            else
-                Punch();
-        }
-
-        // Camera ability
-        if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
-        {
-            gameCamera?.StartFollowing(transform);
-            _isCameraActive = true;
-        }
+        HandleJump();
+        HandleWeaponSwitch();
+        HandleAttack();
+        HandleCamera();
     }
 
     void FixedUpdate()
     {
+        Move();
+        HandleJumpPhysics();
+        HandleFootsteps();
+        SaveGroundedPosition();
+    }
+
+    // ================= MOVEMENT =================
+
+    void Move()
+    {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
+        Vector3 input = new Vector3(h, 0f, v);
 
-        Vector3 move = new Vector3(h, 0f, v);
-        _rb.MovePosition(_rb.position + move * (moveSpeed * Time.fixedDeltaTime));
+        _rb.MovePosition(_rb.position + input * (moveSpeed * Time.fixedDeltaTime));
 
-        if (move.sqrMagnitude > 0.01f)
+        if (input.sqrMagnitude > 0.01f)
         {
-            Quaternion rot = Quaternion.LookRotation(move);
+            Quaternion rot = Quaternion.LookRotation(input);
             _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, rot, turnSpeed * Time.fixedDeltaTime));
         }
 
-        characterAnimator?.SetFloat(Speed, move.magnitude);
+        characterAnimator?.SetFloat(Speed, input.magnitude);
+    }
 
-        if (_jumpRequest)
+    void HandleJump()
+    {
+        if (Input.GetButtonDown("Jump") && IsGrounded() &&
+            GameManager.Instance.HasAbility(AbilityType.Jump))
         {
-            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            _jumpRequest = false;
+            _jumpRequest = true;
+            characterAnimator?.SetTrigger(Jump);
+            SoundManager.Instance?.PlaySFX(jumpSound);
         }
+    }
 
-        if (move.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime)
+    void HandleJumpPhysics()
+    {
+        if (!_jumpRequest) return;
+
+        _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        _jumpRequest = false;
+    }
+
+    void HandleFootsteps()
+    {
+        if (!IsGrounded()) return;
+
+        float speed = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z).magnitude;
+        if (speed > 0.1f && Time.time > _nextStepTime)
         {
             SoundManager.Instance?.PlaySFX(footstepSound);
             _nextStepTime = Time.time + footstepRate;
         }
+    }
 
-        if (IsGrounded())
+    // ================= COMBAT =================
+
+    void HandleWeaponSwitch()
+    {
+        if (!Input.GetButtonDown("Fire2")) return;
+        if (!GameManager.Instance.HasAbility(AbilityType.Gun)) return;
+
+        if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun &&
+            GameManager.Instance.HasAbility(AbilityType.Punch))
         {
-            _positionHistory.Enqueue(transform.position);
-            if (_positionHistory.Count > historyDuration / Time.fixedDeltaTime)
-                _positionHistory.Dequeue();
+            GameManager.Instance.ChangeWeapon(AbilityType.Punch);
+            gunModel.SetActive(false);
+        }
+        else
+        {
+            GameManager.Instance.ChangeWeapon(AbilityType.Gun);
+            gunModel.SetActive(true);
+        }
+    }
+
+    void HandleAttack()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
+        if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun &&
+            GameManager.Instance.HasAbility(AbilityType.Gun))
+        {
+            Shoot();
+        }
+        else if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Punch &&
+                 GameManager.Instance.HasAbility(AbilityType.Punch))
+        {
+            Punch();
         }
     }
 
@@ -203,6 +220,33 @@ public class PlayerController : MonoBehaviour
             h.GetComponent<BreakableBox>()?.TakeDamage();
     }
 
+    // ================= CAMERA =================
+
+    void HandleCamera()
+    {
+        if (_cameraActive) return;
+        if (!GameManager.Instance.HasAbility(AbilityType.Camera)) return;
+
+        gameCamera?.StartFollowing(transform);
+        _cameraActive = true;
+    }
+
+    // ================= UTIL =================
+
+    bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, _groundDist + 0.5f);
+    }
+
+    void SaveGroundedPosition()
+    {
+        if (!IsGrounded()) return;
+
+        _positionHistory.Enqueue(transform.position);
+        if (_positionHistory.Count > historyDuration / Time.fixedDeltaTime)
+            _positionHistory.Dequeue();
+    }
+
     public void Respawn()
     {
         transform.position = _positionHistory.Count > 0
@@ -214,15 +258,8 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (characterAnimator != null)
-        {
-            characterAnimator.transform.localPosition = _initialModelPos;
-            characterAnimator.transform.localRotation = _initialModelRot;
-        }
-    }
-
-    bool IsGrounded()
-    {
-        return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
+        if (!characterAnimator) return;
+        characterAnimator.transform.localPosition = _initialModelPos;
+        characterAnimator.transform.localRotation = _initialModelRot;
     }
 }
