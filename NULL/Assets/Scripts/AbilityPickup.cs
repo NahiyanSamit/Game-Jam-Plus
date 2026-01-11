@@ -2,147 +2,80 @@ using UnityEngine;
 
 public class AbilityPickup : MonoBehaviour
 {
-    public AbilityType abilityToUnlock; 
+    public AbilityType abilityToUnlock;
     public GameObject pickupEffect;
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player"))
+            return;
+
+        // ================= 1. UNLOCK ABILITY =================
+        if (GameManager.Instance != null)
+            GameManager.Instance.UnlockAbility(abilityToUnlock);
+
+        // ================= 2. FUN POINTS =================
+        if (FunManager.Instance != null)
+            FunManager.Instance.AddFun(10f);
+
+        // ================= 3. VISUAL SWITCHER =================
+        PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
+        if (visuals != null)
         {
-            // ------------------------------------------------------------
-            // 1. Unlock in GameManager (Backend logic)
-            // ------------------------------------------------------------
-            // This handles Jump, Camera, Punch, etc. automatically!
-            if (GameManager.Instance != null)
-                GameManager.Instance.UnlockAbility(abilityToUnlock);
+            if (abilityToUnlock == AbilityType.CharacterArt)
+                visuals.UnlockArtModel();
 
-            // ------------------------------------------------------------
-            // 2. Add Fun Points
-            // ------------------------------------------------------------
-            if (FunManager.Instance != null)
-                FunManager.Instance.AddFun(10f);
+            if (abilityToUnlock == AbilityType.Texture)
+                visuals.UnlockTexture();
 
-            // ------------------------------------------------------------
-            // 3. Update Visuals (Art, Texture, Animation)
-            // ------------------------------------------------------------
-            PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
-
-            if (visuals != null)
-            {
-                if (abilityToUnlock == AbilityType.CharacterArt) visuals.UnlockArtModel(); 
-                if (abilityToUnlock == AbilityType.Texture) visuals.UnlockTexture();
-                if (abilityToUnlock == AbilityType.Animation) visuals.UnlockAnimationModel();
-            }
-
-            // ------------------------------------------------------------
-            // 4. Enable the Main UI Panel
-            // ------------------------------------------------------------
-            if (abilityToUnlock == AbilityType.UI)
-            {
-                if (UIManager.Instance != null)
-                {
-                    UIManager.Instance.EnableGameUI();
-                }
-            }
-
-            // ------------------------------------------------------------
-            // 5. NEW: Enable Sound Controls
-            // ------------------------------------------------------------
-            if (abilityToUnlock == AbilityType.Sound)
-            {
-                if (SoundManager.Instance != null)
-                {
-                    SoundManager.Instance.UnlockSoundControl();
-                }
-                else
-                {
-                    Debug.LogWarning("SoundManager is missing from the scene!");
-                }
-            }
-            // ------------------------------------------------------------
-            // 5. NEW: Enable Brightness Controls
-            // ------------------------------------------------------------
-            if (abilityToUnlock == AbilityType.Brightness)
-            {
-                if (BrightnessManager.Instance != null)
-                {
-                    UIManager.Instance.UnlockBrightness();
-
-                }
-                else
-                {
-                    Debug.LogWarning("SoundManager is missing from the scene!");
-                }
-            }
-            
-            if (abilityToUnlock == AbilityType.Punch)
-            {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
-                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("SoundManager is missing from the scene!");
-                }
-            }
-
-            // ------------------------------------------------------------
-            // 5. NEW: Buy Gun 
-            // ------------------------------------------------------------
-            if (abilityToUnlock == AbilityType.Gun)
-            {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.BuyGun();
-                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
-                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("SoundManager is missing from the scene!");
-                }
-            }
-
-            // ------------------------------------------------------------
-            // 6. Effect & Destroy
-            // ------------------------------------------------------------
-            if (pickupEffect != null)
-                Instantiate(pickupEffect, transform.position, Quaternion.identity);
-
-            Destroy(gameObject);
+            if (abilityToUnlock == AbilityType.Animation)
+                visuals.UnlockAnimationModel();
         }
 
-        // SOUND ability
-        if (abilityToUnlock == AbilityType.Sound)
-        {
-            UIManager.Instance.UnlockSound();
-        }
+        // ================= 4. UI ABILITIES =================
+        if (abilityToUnlock == AbilityType.UI)
+            UIManager.Instance?.EnableGameUI();
 
-        // SETTINGS ability
         if (abilityToUnlock == AbilityType.Settings)
-        {
-            UIManager.Instance.UnlockSettings();
-        }
+            UIManager.Instance?.UnlockSettings();
 
-        // BRIGHTNESS ability
-        if (abilityToUnlock == AbilityType.Brightness)
-        {
-            UIManager.Instance.UnlockBrightness();
-        }
-
-        // EXIT ability
         if (abilityToUnlock == AbilityType.Exit)
+            UIManager.Instance?.UnlockExit();
+
+        // ================= 5. SOUND / BRIGHTNESS =================
+        if (abilityToUnlock == AbilityType.Sound)
+            SoundManager.Instance?.UnlockSoundControl();
+
+        if (abilityToUnlock == AbilityType.Brightness)
+            UIManager.Instance?.UnlockBrightness();
+
+        // ================= 6. COMBAT ABILITIES =================
+        if (abilityToUnlock == AbilityType.Punch)
         {
-            UIManager.Instance.UnlockExit();
+            if (GameManager.Instance != null)
+                GameManager.Instance.ChangeWeapon(AbilityType.Punch);
         }
 
-    }
+        if (abilityToUnlock == AbilityType.Gun)
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.BuyGun();
 
+                if (GameManager.Instance.HasAbility(AbilityType.Gun))
+                    GameManager.Instance.ChangeWeapon(AbilityType.Gun);
+            }
+        }
+
+        // ================= 7. APPLY ABILITY EFFECTS =================
+        AbilityApplier applier = other.GetComponent<AbilityApplier>();
+        if (applier != null)
+            applier.ApplyAbilities();
+
+        // ================= 8. EFFECT & DESTROY =================
+        if (pickupEffect != null)
+            Instantiate(pickupEffect, transform.position, Quaternion.identity);
+
+        Destroy(gameObject);
+    }
 }

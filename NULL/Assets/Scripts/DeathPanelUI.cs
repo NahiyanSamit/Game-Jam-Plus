@@ -5,7 +5,10 @@ public class DeathPanelUI : MonoBehaviour
     public static DeathPanelUI Instance;
 
     [Header("Respawn Point")]
-    public Transform respawnPoint;   // assign in Inspector
+    public Transform respawnPoint;
+
+    [Header("Death Penalty")]
+    [SerializeField] private int abilitiesToLose = 5;
 
     void Awake()
     {
@@ -34,11 +37,11 @@ public class DeathPanelUI : MonoBehaviour
     {
         Hide();
 
-        // 🔻 Ability penalty
+        // 🔻 Remove abilities
         if (GameManager.Instance != null)
-            GameManager.Instance.RemoveRandomAbilities(5);
+            GameManager.Instance.RemoveRandomAbilities(abilitiesToLose);
 
-        // ✅ Safe player restore (NO custom methods)
+        // ✅ Restore player (UNCHANGED)
         PlayerController player = FindFirstObjectByType<PlayerController>();
         if (player != null)
         {
@@ -53,5 +56,10 @@ public class DeathPanelUI : MonoBehaviour
             if (rb != null)
                 rb.linearVelocity = Vector3.zero;
         }
+
+        // ⭐⭐⭐ THIS IS THE ONLY NEW PART ⭐⭐⭐
+        AbilityApplier applier = FindFirstObjectByType<AbilityApplier>();
+        if (applier != null)
+            applier.ApplyAbilities();
     }
 }

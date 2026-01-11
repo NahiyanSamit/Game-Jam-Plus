@@ -261,4 +261,11 @@ public class PlayerController : MonoBehaviour
     {
         return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
     }
+    
+    public void DisableGun()
+    {
+        if (gunModel != null)
+            gunModel.SetActive(false);
+    }
+
 }

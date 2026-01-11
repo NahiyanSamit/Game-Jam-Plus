@@ -102,4 +102,20 @@ public class SoundManager : MonoBehaviour
             sfxSource.PlayOneShot(clip);
         }
     }
+    
+    public void LockSoundControl()
+    {
+        _isSoundActive = false;
+
+        // Stop music
+        if (musicSource != null)
+            musicSource.Stop();
+
+        // Hide UI
+        if (soundUIContainer != null)
+            soundUIContainer.SetActive(false);
+
+        Debug.Log("Sound System Locked!");
+    }
+
 }

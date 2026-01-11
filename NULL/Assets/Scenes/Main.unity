@@ -4444,6 +4444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnPoint: {fileID: 702171485}
+  abilitiesToLose: 5
 --- !u!114 &1117191054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8552,6 +8553,7 @@ GameObject:
   - component: {fileID: 2060188229}
   - component: {fileID: 2060188228}
   - component: {fileID: 2060188230}
+  - component: {fileID: 2060188231}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -8612,7 +8614,6 @@ MonoBehaviour:
     m_Bits: 8
   fallThreshold: -10
   historyDuration: 2
-  respawnPoint: {fileID: 0}
   damage: 2
 --- !u!4 &2060188224
 Transform:
@@ -8724,6 +8725,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathSound: {fileID: 0}
+--- !u!114 &2060188231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060188219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd44643967598d41b2fb3964dc13d02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 2060188221}
 --- !u!1 &2060959300
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,25 +18,20 @@ public class UIManager : MonoBehaviour
 
     public int coin = 0;
     public bool isBrightnessUnlocked = false;
+
     void Awake()
     {
-        // Singleton setup
         if (Instance == null) Instance = this;
     }
 
     void Start()
     {
-        // 1. Hide the UI when the game starts
         if (mainUIPanel != null)
-        {
             mainUIPanel.SetActive(false);
-        }
 
-        // 2. Initialize Coin Text to 0
         UpdateCoinDisplay(0);
     }
 
-    // Function to turn the UI on (called by AbilityPickup)
     public void EnableGameUI()
     {
         if (mainUIPanel != null)
@@ -46,8 +41,16 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- NEW: UPDATE COIN TEXT ---
-    // Called by GameManager whenever we get money or buy a gun
+    // ✅ NEW (REQUIRED)
+    public void DisableGameUI()
+    {
+        if (mainUIPanel != null)
+        {
+            mainUIPanel.SetActive(false);
+            Debug.Log("UI Disabled!");
+        }
+    }
+
     public void UpdateCoinDisplay(int coins)
     {
         if (coinText != null)
@@ -81,6 +84,27 @@ public class UIManager : MonoBehaviour
     public void UnlockExit()
     {
         exitButton.SetUnlocked(true);
+    }
+    
+    public void LockSound()
+    {
+        soundButton.SetUnlocked(false);
+    }
+
+    public void LockSettings()
+    {
+        settingsButton.SetUnlocked(false);
+    }
+
+    public void LockBrightness()
+    {
+        isBrightnessUnlocked = false;
+        brightnessIcon.SetUnlocked(false);
+    }
+
+    public void LockExit()
+    {
+        exitButton.SetUnlocked(false);
     }
 
 }
