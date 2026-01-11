@@ -62,7 +62,7 @@ public class DeathPanelUI : MonoBehaviour
             PlayerDeath death = player.GetComponent<PlayerDeath>();
             if (death != null)
                 death.ResetDeathState();
-
+            death.ResetAnimator();
         }
 
         // ⭐ Ensure abilities affect UI / gun / sound
