@@ -37,11 +37,9 @@ public class DeathPanelUI : MonoBehaviour
     {
         Hide();
 
-        // 🔻 Remove abilities
         if (GameManager.Instance != null)
             GameManager.Instance.RemoveRandomAbilities(abilitiesToLose);
 
-        // ✅ Restore player (UNCHANGED)
         PlayerController player = FindFirstObjectByType<PlayerController>();
         if (player != null)
         {
@@ -55,11 +53,22 @@ public class DeathPanelUI : MonoBehaviour
             Rigidbody rb = player.GetComponent<Rigidbody>();
             if (rb != null)
                 rb.linearVelocity = Vector3.zero;
+
+            // ⭐⭐⭐ RESET HEALTH (THIS FIXES IT) ⭐⭐⭐
+            Health health = player.GetComponent<Health>();
+            if (health != null)
+                health.ResetHealth();
+            
+            PlayerDeath death = player.GetComponent<PlayerDeath>();
+            if (death != null)
+                death.ResetDeathState();
+
         }
 
-        // ⭐⭐⭐ THIS IS THE ONLY NEW PART ⭐⭐⭐
+        // ⭐ Ensure abilities affect UI / gun / sound
         AbilityApplier applier = FindFirstObjectByType<AbilityApplier>();
         if (applier != null)
             applier.ApplyAbilities();
     }
+
 }
