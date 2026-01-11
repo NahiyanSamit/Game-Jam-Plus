@@ -7,21 +7,18 @@ using UnityEngine.EventSystems;
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
-    public CameraFollow gameCamera; 
-    public Animator characterAnimator; 
+    public CameraFollow gameCamera;
+    public Animator characterAnimator;
 
     [Header("Gun Settings")]
-    public GameObject gunModel;         
-    public Transform muzzlePoint;       
-    
-    // --- CHANGE 1: We use GameObject now, it is easier to assign ---
-    public GameObject muzzleFlashObject;  // Drag 'VFX_M4' here
-    private ParticleSystem _muzzleFlashParticles; // Internal reference
-    // ---------------------------------------------------------------
+    public GameObject gunModel;
+    public Transform muzzlePoint;
+    public GameObject muzzleFlashObject;
+    private ParticleSystem _muzzleFlashParticles;
 
-    public float shootingRange = 20f;   
-    public LayerMask enemyLayer;        
-    private int shootableMask; 
+    public float shootingRange = 20f;
+    public LayerMask enemyLayer;
+    private int shootableMask;
 
     [Header("Audio Clips")]
     public AudioClip jumpSound;
@@ -31,25 +28,29 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float turnSpeed = 15f; 
+    public float turnSpeed = 15f;
     public float jumpForce = 8f;
-    public float footstepRate = 0.5f; 
+    public float footstepRate = 0.5f;
 
     [Header("Punch Settings")]
-    public float punchRange = 1.5f;             
-    public Vector3 hitOffset = new Vector3(0, 1f, 1f); 
-    public LayerMask breakableLayer; 
+    public float punchRange = 1.5f;
+    public Vector3 hitOffset = new Vector3(0, 1f, 1f);
+    public LayerMask breakableLayer;
 
-    [Header("Respawn Settings")]
-    public float fallThreshold = -10f; 
-    public float historyDuration = 2.0f; 
+    [Header("Respawn / Death")]
+    public float fallThreshold = -10f;
+    public float historyDuration = 2.0f;
+    public Transform respawnPoint;             // ⭐ NEW
+
     [SerializeField] private int damage = 2;
+
     private Rigidbody _rb;
     private float _distToGround;
-    private bool _jumpRequest; 
+    private bool _jumpRequest;
     private bool _isCameraActive = false;
     private float _nextStepTime;
-    
+    private bool controlsEnabled = true;       // ⭐ NEW
+
     private Vector3 _initialModelLocalPos;
     private Quaternion _initialModelLocalRot;
     private Queue<Vector3> _positionHistory = new Queue<Vector3>();
@@ -59,48 +60,45 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<Collider>().bounds.extents.y;
         shootableMask = enemyLayer | breakableLayer;
-        
+
         if (characterAnimator != null)
         {
             _initialModelLocalPos = characterAnimator.transform.localPosition;
             _initialModelLocalRot = characterAnimator.transform.localRotation;
         }
 
-        if (gameCamera == null) gameCamera = FindFirstObjectByType<CameraFollow>();
+        if (gameCamera == null)
+            gameCamera = FindFirstObjectByType<CameraFollow>();
 
-        // --- CHANGE 2: Auto-Find the Particle System ---
         if (muzzleFlashObject != null)
         {
-            // We look for the particle component on the object you dragged in
             _muzzleFlashParticles = muzzleFlashObject.GetComponent<ParticleSystem>();
-            
-            // Safety: Stop it from playing at the start
-            if (_muzzleFlashParticles != null) _muzzleFlashParticles.Stop(); 
+            if (_muzzleFlashParticles != null)
+                _muzzleFlashParticles.Stop();
         }
-        // -----------------------------------------------
 
         if (gunModel != null)
         {
             gunModel.SetActive(false);
             if (GameManager.Instance != null && GameManager.Instance.HasAbility(AbilityType.Gun))
-            {
                 gunModel.SetActive(true);
-            }
         }
-        
+
         if (MessageManager.Instance != null)
             MessageManager.Instance.ShowMessage("Level Start!", 3f);
     }
-    
+
     void Update()
     {
+        if (!controlsEnabled) return; // ⭐ BLOCK INPUT
         if (GameManager.Instance == null) return;
 
-        if (transform.position.y < fallThreshold) Respawn();
+        if (transform.position.y < fallThreshold)
+            Respawn();
 
         if (gunModel != null && !gunModel.activeSelf)
         {
-            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
                 gunModel.SetActive(true);
         }
 
@@ -109,43 +107,90 @@ public class PlayerController : MonoBehaviour
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
             {
                 _jumpRequest = true;
-                if (characterAnimator != null) characterAnimator.SetTrigger("Jump");
-                if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(jumpSound);
-                
+                if (characterAnimator != null)
+                    characterAnimator.SetTrigger("Jump");
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.PlaySFX(jumpSound);
             }
         }
 
         if (Input.GetButtonDown("Fire2"))
         {
-            if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun && GameManager.Instance.HasAbility(AbilityType.Gun))
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
             {
                 GameManager.Instance.ChangeWeapon(AbilityType.Punch);
                 gunModel.SetActive(false);
             }
-            else if(GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch && GameManager.Instance.HasAbility(AbilityType.Gun))
+            else if (GameManager.Instance.HasAbility(AbilityType.Gun))
             {
                 GameManager.Instance.ChangeWeapon(AbilityType.Gun);
                 gunModel.SetActive(true);
             }
         }
 
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButtonDown(0))
         {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
 
-            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
-            {
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
                 ShootGun();
-            }
-            else if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Punch)
-            {
+            else
                 PerformPunch();
-            }
         }
-        
+
         if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
         {
-            if (gameCamera != null) { gameCamera.StartFollowing(transform); _isCameraActive = true; }
+            if (gameCamera != null)
+            {
+                gameCamera.StartFollowing(transform);
+                _isCameraActive = true;
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (!controlsEnabled) return; // ⭐ BLOCK MOVEMENT
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+        Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
+
+        Vector3 movement = inputVector * moveSpeed;
+        _rb.MovePosition(_rb.position + movement * Time.fixedDeltaTime);
+
+        if (inputVector.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(inputVector);
+            _rb.MoveRotation(
+                Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime)
+            );
+        }
+
+        if (characterAnimator != null)
+            characterAnimator.SetFloat("Speed", inputVector.magnitude);
+
+        if (_jumpRequest)
+        {
+            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _jumpRequest = false;
+        }
+
+        if (inputVector.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime)
+        {
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlaySFX(footstepSound);
+
+            _nextStepTime = Time.time + footstepRate;
+        }
+
+        if (IsGrounded())
+        {
+            _positionHistory.Enqueue(transform.position);
+            if (_positionHistory.Count > (historyDuration / Time.fixedDeltaTime))
+                _positionHistory.Dequeue();
         }
     }
 
@@ -159,102 +204,86 @@ public class PlayerController : MonoBehaviour
             _muzzleFlashParticles.Stop();
             _muzzleFlashParticles.Play();
         }
-        
 
         RaycastHit hit;
-        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
-        
+        Vector3 startPos = muzzlePoint != null ? muzzlePoint.position : transform.position + Vector3.up;
+
         if (Physics.Raycast(startPos, transform.forward, out hit, shootingRange, shootableMask))
         {
-            Debug.Log("Bullet lagche: " + hit.collider.gameObject.name);
-
             Health health = hit.collider.GetComponent<Health>();
             if (health != null)
-            {
                 health.TakeDamage(damage);
-            }
 
             BreakableBox box = hit.collider.GetComponent<BreakableBox>();
             if (box != null)
-            {
                 box.TakeDamage();
-            }
         }
 
-        // 🔍 Visual debug
         Debug.DrawRay(startPos, transform.forward * shootingRange, Color.red, 1f);
     }
 
-
     void PerformPunch()
     {
-        if (characterAnimator != null) characterAnimator.SetTrigger("Punch");
-        if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(punchSound);
-        CheckForBreakables();
-    }
+        if (characterAnimator != null)
+            characterAnimator.SetTrigger("Punch");
 
-    void CheckForBreakables()
-    {
-        Vector3 spherePos = transform.position + (transform.up * hitOffset.y) + (transform.forward * hitOffset.z);
-        Collider[] hitColliders = Physics.OverlapSphere(spherePos, punchRange, breakableLayer);
-        foreach (var hit in hitColliders) {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFX(punchSound);
+
+        Vector3 spherePos = transform.position + transform.up * hitOffset.y + transform.forward * hitOffset.z;
+        Collider[] hits = Physics.OverlapSphere(spherePos, punchRange, breakableLayer);
+
+        foreach (var hit in hits)
+        {
             BreakableBox box = hit.GetComponent<BreakableBox>();
-            if (box != null) box.TakeDamage(); 
+            if (box != null)
+                box.TakeDamage();
         }
     }
 
-    void FixedUpdate()
+    public void Respawn()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
-        
-        Vector3 movement = inputVector * moveSpeed;
-        Vector3 targetPos = _rb.position + movement * Time.fixedDeltaTime;
-        _rb.MovePosition(targetPos);
+        if (_positionHistory.Count > 0)
+            transform.position = _positionHistory.Peek();
+        else
+            transform.position = new Vector3(0, 2, 0);
 
-        if (inputVector.sqrMagnitude > 0.01f) {
-            Quaternion targetRotation = Quaternion.LookRotation(inputVector);
-            Quaternion nextRotation = Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
-            _rb.MoveRotation(nextRotation);
-        }
-
-        if (characterAnimator != null) characterAnimator.SetFloat("Speed", inputVector.magnitude);
-        if (_jumpRequest) { _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); _jumpRequest = false; }
-
-        if (inputVector.magnitude > 0.1f && IsGrounded() && Time.time > _nextStepTime) {
-            //if (SoundManager.Instance != null) SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERRUN);
-            if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(footstepSound);
-            _nextStepTime = Time.time + footstepRate;
-        }
-
-        if (IsGrounded()) { 
-            _positionHistory.Enqueue(transform.position); 
-            if (_positionHistory.Count > (historyDuration / Time.fixedDeltaTime)) _positionHistory.Dequeue(); 
-        }
+        _rb.linearVelocity = Vector3.zero;
     }
 
-   public void Respawn() {
-        if (_positionHistory.Count > 0) { transform.position = _positionHistory.Peek(); _rb.linearVelocity = Vector3.zero; }
-        else { transform.position = new Vector3(0, 2, 0); _rb.linearVelocity = Vector3.zero; }
+    // ===================== DEATH SYSTEM =====================
+
+    public void DisableControls()
+    {
+        controlsEnabled = false;
+        _rb.linearVelocity = Vector3.zero;
     }
 
-    void LateUpdate() {
-        if (characterAnimator != null) {
+    public void RevivePlayer()
+    {
+        controlsEnabled = true;
+
+        if (respawnPoint != null)
+            transform.position = respawnPoint.position;
+
+        _rb.linearVelocity = Vector3.zero;
+
+        Health health = GetComponent<Health>();
+        if (health != null)
+            health.ResetHealth();
+    }
+
+    void LateUpdate()
+    {
+        if (characterAnimator != null)
+        {
             characterAnimator.transform.localPosition = _initialModelLocalPos;
             characterAnimator.transform.localRotation = _initialModelLocalRot;
         }
     }
 
-    void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        Vector3 spherePos = transform.position + (transform.up * hitOffset.y) + (transform.forward * hitOffset.z);
-        Gizmos.DrawWireSphere(spherePos, punchRange);
-        
-        Gizmos.color = Color.yellow;
-        Vector3 startPos = (muzzlePoint != null) ? muzzlePoint.position : transform.position + Vector3.up;
-        Gizmos.DrawRay(startPos, transform.forward * shootingRange);
+    bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f);
     }
-
-    bool IsGrounded() { return Physics.Raycast(transform.position, Vector3.down, _distToGround + 0.5f); }
 }

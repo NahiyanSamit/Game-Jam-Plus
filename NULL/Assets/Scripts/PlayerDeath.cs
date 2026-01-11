@@ -1,41 +1,52 @@
-using SmallHedge.SoundManager;
 using UnityEngine;
+using System.Collections;
+using SmallHedge.SoundManager;
 
 public class PlayerDeath : MonoBehaviour
 {
-   [SerializeField] private Animator animator;
+    [SerializeField] private AudioClip deathSound;
+
+    private Animator animator;
     private Health health;
+    private PlayerController controller;
     private bool isDead = false;
-    private PlayerController playerController;
+
     void Awake()
     {
-       
         animator = GetComponentInChildren<Animator>();
-        playerController = GetComponentInParent<PlayerController>();
         health = GetComponent<Health>();
-
-        if (animator == null)
-            Debug.LogError("Animator not found in children!");
-        if(health == null) return;
-        if (health == null)
-            Debug.LogError("Health not found in children!");
+        controller = GetComponent<PlayerController>();
     }
 
     void Update()
     {
-        CheckDeath();
+        if (isDead) return;
+
+        if (health != null && health.CurrentHealth <= 0)
+        {
+            Die();
+        }
     }
 
-    private void CheckDeath()
+    void Die()
     {
-        if (health == null || animator == null || isDead) return;
+        isDead = true;
 
-        if (!isDead && health.CurrentHealth <= 0)
-        {
-            isDead = true;
-            SmallHedge.SoundManager.SoundManager.PlaySound(SoundType.PLAYERDEATH);
+        if (SoundManager.Instance != null && deathSound != null)
+            SoundManager.Instance.PlaySFX(deathSound);
+
+        if (animator != null)
             animator.SetTrigger("Death");
-            playerController.Respawn();
-        }
+
+        // ✅ NO DisableControls() call
+        controller.enabled = false;
+
+        StartCoroutine(DeathDelay());
+    }
+
+    IEnumerator DeathDelay()
+    {
+        yield return new WaitForSeconds(3f);
+        DeathPanelUI.Instance.Show();
     }
 }
