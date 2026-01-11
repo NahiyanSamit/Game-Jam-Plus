@@ -49,4 +49,10 @@ public class PlayerDeath : MonoBehaviour
         yield return new WaitForSeconds(3f);
         DeathPanelUI.Instance.Show();
     }
+    
+    public void ResetDeathState()
+    {
+        isDead = false;
+    }
+
 }
