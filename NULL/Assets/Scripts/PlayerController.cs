@@ -93,11 +93,14 @@ public class PlayerController : MonoBehaviour
         if (transform.position.y < fallThreshold)
             Respawn();
 
-        if (gunModel != null && !gunModel.activeSelf)
+        if (gunModel != null)
         {
-            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
-                gunModel.SetActive(true);
+            bool hasGun = GameManager.Instance.HasAbility(AbilityType.Gun);
+            gunModel.SetActive(
+                hasGun && GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun
+            );
         }
+
 
         // ================= JUMP =================
         if (Input.GetButtonDown("Jump") && IsGrounded())
