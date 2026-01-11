@@ -36,14 +36,13 @@ public class AbilityApplier : MonoBehaviour
         }
 
 
-        // =================== SOUND ===================
+// =================== SOUND ===================
         if (SoundManager.Instance != null)
         {
-            if (GameManager.Instance.HasAbility(AbilityType.Sound))
-                SoundManager.Instance.UnlockSoundControl();
-            else
+            if (!GameManager.Instance.HasAbility(AbilityType.Sound))
                 SoundManager.Instance.LockSoundControl();
         }
+
 
         // =================== BRIGHTNESS ===================
         if (UIManager.Instance != null)
