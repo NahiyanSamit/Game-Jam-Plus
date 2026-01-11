@@ -18,11 +18,13 @@ public class AbilityApplier : MonoBehaviour
         // =================== GUN ===================
         if (!GameManager.Instance.HasAbility(AbilityType.Gun))
         {
-            playerController.DisableGun();
+            if (playerController.gunModel != null)
+                playerController.gunModel.SetActive(false);
 
             if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
                 GameManager.Instance.ChangeWeapon(AbilityType.Punch);
         }
+
 
         // =================== UI ===================
         if (UIManager.Instance != null)
