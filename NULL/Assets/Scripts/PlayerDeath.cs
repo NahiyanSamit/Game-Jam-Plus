@@ -54,5 +54,15 @@ public class PlayerDeath : MonoBehaviour
     {
         isDead = false;
     }
+    
+    public void ResetAnimator()
+    {
+        if (animator != null)
+        {
+            animator.ResetTrigger("Death");
+            animator.Play("Idle", 0, 0f);
+        }
+    }
+
 
 }
