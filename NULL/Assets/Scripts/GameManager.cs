@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,11 +8,24 @@ public class GameManager : MonoBehaviour
     [Header("Abilities")]
     public List<AbilityType> unlockedAbilities = new List<AbilityType>();
 
-    private AbilityType _currentWeapon = AbilityType.Punch; // default fallback
+    [Header("Weapon")]
+    [SerializeField] private AbilityType currentWeapon = AbilityType.None;
 
     [Header("Economy")]
     public int coinCount = 0;
     public int gunPrice = 50;
+
+    [Header("Death Penalty")]
+    public int abilityLossCount = 2;
+
+    public List<AbilityType> permanentAbilities = new List<AbilityType>
+    {
+        AbilityType.Jump,
+        AbilityType.Camera,
+        AbilityType.CharacterArt,
+        AbilityType.Texture,
+        AbilityType.Animation
+    };
 
     void Awake()
     {
@@ -28,8 +40,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ================= ABILITY =================
-
+    // -------- Ability --------
     public void UnlockAbility(AbilityType ability)
     {
         if (!unlockedAbilities.Contains(ability))
@@ -44,93 +55,71 @@ public class GameManager : MonoBehaviour
         return unlockedAbilities.Contains(ability);
     }
 
-    // ================= WEAPON =================
-
-    public void ChangeWeapon(AbilityType weaponType)
+    // -------- Weapon --------
+    public void ChangeWeapon(AbilityType weapon)
     {
-        // Only allow weapon abilities here
-        if (!HasAbility(weaponType))
+        if (weapon == AbilityType.None)
         {
-            Debug.LogWarning("Weapon not unlocked: " + weaponType);
+            currentWeapon = AbilityType.None;
             return;
         }
 
-        _currentWeapon = weaponType;
-        Debug.Log("Equipped weapon: " + _currentWeapon);
+        if (HasAbility(weapon))
+        {
+            currentWeapon = weapon;
+            Debug.Log("Equipped: " + weapon);
+        }
     }
 
     public AbilityType GetCurrentWeapon()
     {
-        return _currentWeapon;
+        return currentWeapon;
     }
 
-    // ================= ECONOMY =================
-
+    // -------- Economy --------
     public void AddCoin(int amount)
     {
         coinCount += amount;
-
-        if (UIManager.Instance != null)
-            UIManager.Instance.UpdateCoinDisplay(coinCount);
+        UIManager.Instance?.UpdateCoinDisplay(coinCount);
     }
 
     public void BuyGun()
     {
-        if (coinCount < gunPrice)
-        {
-            Debug.Log("Not enough coins to buy gun");
-            return;
-        }
+        if (HasAbility(AbilityType.Gun)) return;
+        if (coinCount < gunPrice) return;
 
         coinCount -= gunPrice;
         UnlockAbility(AbilityType.Gun);
         ChangeWeapon(AbilityType.Gun);
 
-        if (UIManager.Instance != null)
-            UIManager.Instance.UpdateCoinDisplay(coinCount);
-
-        Debug.Log("Gun purchased successfully");
+        UIManager.Instance?.UpdateCoinDisplay(coinCount);
     }
 
-    // ================= PERMANENT ABILITY =================
-
-    public bool IsPermanentAbility(AbilityType ability)
+    // -------- Death Ability Loss --------
+    public void LoseRandomAbilities()
     {
-        switch (ability)
+        List<AbilityType> removable = new List<AbilityType>();
+
+        foreach (var a in unlockedAbilities)
         {
-            case AbilityType.Jump:
-            case AbilityType.Texture:
-            case AbilityType.Animation:
-            case AbilityType.Camera:
-            case AbilityType.CharacterArt:
-                return true;
-
-            default:
-                return false;
+            if (!permanentAbilities.Contains(a))
+                removable.Add(a);
         }
-    }
 
-    public void RemoveRandomNonPermanentAbilities(int amount)
-    {
-        List<AbilityType> removable = unlockedAbilities
-            .Where(a => !IsPermanentAbility(a))
-            .ToList();
+        int loss = Mathf.Min(abilityLossCount, removable.Count);
 
-        int removeCount = Mathf.Min(amount, removable.Count);
-
-        for (int i = 0; i < removeCount; i++)
+        for (int i = 0; i < loss; i++)
         {
             int index = Random.Range(0, removable.Count);
-            AbilityType removed = removable[index];
+            AbilityType lost = removable[index];
 
-            unlockedAbilities.Remove(removed);
             removable.RemoveAt(index);
+            unlockedAbilities.Remove(lost);
 
-            Debug.Log("Lost ability: " + removed);
+            Debug.Log("Lost ability: " + lost);
 
-            // If gun lost, fallback to punch
-            if (removed == AbilityType.Gun)
-                _currentWeapon = AbilityType.Punch;
+            if (currentWeapon == lost)
+                currentWeapon = AbilityType.None;
         }
     }
 }

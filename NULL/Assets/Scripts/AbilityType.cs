@@ -1,5 +1,6 @@
 public enum AbilityType
 {
+    None,
     Jump,
     Camera,
     CharacterArt,

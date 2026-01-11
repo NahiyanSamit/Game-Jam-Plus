@@ -5651,6 +5651,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Ui Pickup '
       objectReference: {fileID: 0}
+    - target: {fileID: 7436979000190797668, guid: 3c4f6f8ae8ac76e47a4e9d5fe10c6a21,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7409,6 +7414,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Brightness Pickup
+      objectReference: {fileID: 0}
+    - target: {fileID: 5990326595478492428, guid: ed4c0f1bb3535f441a3cf13d17690066,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15233,6 +15243,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1968213186172603630, guid: 30a0e7aa4ea3cd14c95c59bc9f618a9c,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 2531273082879779989, guid: 30a0e7aa4ea3cd14c95c59bc9f618a9c,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -16139,6 +16154,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PunchPickup
       objectReference: {fileID: 0}
+    - target: {fileID: 5539512525447124427, guid: 4942306854e009942aa3b1df098feee0,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 7654525671296264665, guid: 4942306854e009942aa3b1df098feee0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -16638,6 +16658,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8991311985904842278, guid: d8c0604cf4c9a0e4e943c02c7bd678b2,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -16935,9 +16960,6 @@ MonoBehaviour:
   waitTimeAtWaypoint: 2.5
   loopType: 1
   moveOnStart: 1
-  passengerMask:
-    serializedVersion: 2
-    m_Bits: 1
 --- !u!54 &7196558055452151219
 Rigidbody:
   m_ObjectHideFlags: 0

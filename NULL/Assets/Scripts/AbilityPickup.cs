@@ -28,6 +28,16 @@ public class AbilityPickup : MonoBehaviour
             GameManager.Instance.UnlockAbility(abilityToUnlock);
         }
 
+        // 🔥 CRITICAL FIX #1 — EQUIP PUNCH WHEN PICKED
+        if (abilityToUnlock == AbilityType.Punch)
+        {
+            GameManager.Instance.ChangeWeapon(AbilityType.Punch);
+        }
+
+        // 🔥 CRITICAL FIX #2 — SYNC PLAYER STATE
+        other.GetComponent<PlayerController>()
+             ?.ApplyAbilitiesFromGameManager();
+
         // ================= FUN =================
         FunManager.Instance?.AddFun(10f);
 

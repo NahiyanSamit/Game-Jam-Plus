@@ -10,7 +10,7 @@ public class PlayerDeath : MonoBehaviour
     public Transform respawnPoint;
 
     [Header("Settings")]
-    public float showPanelDelay = 3f;
+    public float panelDelay = 3f;
 
     private Health health;
     private bool isDead;
@@ -31,7 +31,9 @@ public class PlayerDeath : MonoBehaviour
         if (isDead || health == null) return;
 
         if (health.CurrentHealth <= 0)
+        {
             Die();
+        }
     }
 
     void Die()
@@ -39,33 +41,36 @@ public class PlayerDeath : MonoBehaviour
         isDead = true;
 
         playerController.enabled = false;
+        animator.SetTrigger("Death");
 
-        if (animator)
-            animator.SetTrigger("Death");
-
-        StartCoroutine(ShowPanelAfterDelay());
+        StartCoroutine(OpenPanel());
     }
 
-    IEnumerator ShowPanelAfterDelay()
+    IEnumerator OpenPanel()
     {
-        yield return new WaitForSeconds(showPanelDelay);
-        deathPanel.Show();   
+        yield return new WaitForSeconds(panelDelay);
+        deathPanel.Show();
     }
 
     // UI BUTTON → CONTINUE
     public void ContinueGame()
     {
-        health.ResetHealth();  
+        // 1. Lose abilities
+        GameManager.Instance.LoseRandomAbilities();
 
-        if (respawnPoint)
-            transform.position = respawnPoint.position;
+        // 2. Respawn
+        health.ResetHealth();
+        transform.position = respawnPoint.position;
 
+        // 3. APPLY ability changes to player
+        playerController.ApplyAbilitiesFromGameManager();
+
+        // 4. Resume
         playerController.enabled = true;
-
-        deathPanel.Hide();      
-
+        deathPanel.Hide();
         isDead = false;
     }
+
 
     // UI BUTTON → QUIT
     public void QuitGame()

@@ -22037,6 +22037,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6863397775614256491, guid: 57528e483399b4445971d77b5ad3524a,
+        type: 3}
+      propertyPath: abilityToUnlock
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -83879,7 +83884,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0d02023cb543b44978f45176f3fab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityToUnlock: 10
+  abilityToUnlock: 11
   pickupEffect: {fileID: 0}
 --- !u!65 &2051899883
 BoxCollider:
