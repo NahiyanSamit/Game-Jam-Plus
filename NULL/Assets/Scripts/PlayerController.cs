@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using DG.Tweening;
+using SmallHedge.SoundManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using SmallHedge.SoundManager;
@@ -68,9 +70,19 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && IsGrounded() &&
             GameManager.Instance.HasAbility(AbilityType.Jump))
         {
-            jumpRequest = true;
-            characterAnimator?.SetTrigger("Jump");
-            SoundManager.Instance?.PlaySFX(jumpSound);
+            if (GameManager.Instance.GetCurrentWeapon()== AbilityType.Gun)
+                gunModel.SetActive(true);
+        }
+
+        if (Input.GetButtonDown("Jump") && IsGrounded())
+        {
+            if (GameManager.Instance.HasAbility(AbilityType.Jump))
+            {
+                _jumpRequest = true;
+                if (characterAnimator != null) characterAnimator.SetTrigger("Jump");
+                if (SoundManager.Instance != null) SoundManager.Instance.PlaySFX(jumpSound);
+                
+            }
         }
 
         // Weapon switch

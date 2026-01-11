@@ -18,14 +18,102 @@ public class AbilityPickup : MonoBehaviour
 
             GameManager.Instance.BuyGun();
 
-            // If buy failed, stop
-            if (!GameManager.Instance.HasAbility(AbilityType.Gun))
-                return;
-        }
-        else
-        {
-            // ================= NORMAL ABILITY =================
-            GameManager.Instance.UnlockAbility(abilityToUnlock);
+            // ------------------------------------------------------------
+            // 3. Update Visuals (Art, Texture, Animation)
+            // ------------------------------------------------------------
+            PlayerVisualSwitcher visuals = other.GetComponent<PlayerVisualSwitcher>();
+
+            if (visuals != null)
+            {
+                if (abilityToUnlock == AbilityType.CharacterArt) visuals.UnlockArtModel(); 
+                if (abilityToUnlock == AbilityType.Texture) visuals.UnlockTexture();
+                if (abilityToUnlock == AbilityType.Animation) visuals.UnlockAnimationModel();
+            }
+
+            // ------------------------------------------------------------
+            // 4. Enable the Main UI Panel
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.UI)
+            {
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.EnableGameUI();
+                }
+            }
+
+            // ------------------------------------------------------------
+            // 5. NEW: Enable Sound Controls
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Sound)
+            {
+                if (SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.UnlockSoundControl();
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
+            // ------------------------------------------------------------
+            // 5. NEW: Enable Brightness Controls
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Brightness)
+            {
+                if (BrightnessManager.Instance != null)
+                {
+                    UIManager.Instance.UnlockBrightness();
+
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
+            
+            if (abilityToUnlock == AbilityType.Punch)
+            {
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
+                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
+
+            // ------------------------------------------------------------
+            // 5. NEW: Buy Gun 
+            // ------------------------------------------------------------
+            if (abilityToUnlock == AbilityType.Gun)
+            {
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.BuyGun();
+                    GameManager.Instance.ChangeWeapon(abilityToUnlock);
+                    if (!GameManager.Instance.HasAbility(abilityToUnlock))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("SoundManager is missing from the scene!");
+                }
+            }
+
+            // ------------------------------------------------------------
+            // 6. Effect & Destroy
+            // ------------------------------------------------------------
+            if (pickupEffect != null)
+                Instantiate(pickupEffect, transform.position, Quaternion.identity);
+
+            Destroy(gameObject);
         }
 
         // 🔥 CRITICAL FIX #1 — EQUIP PUNCH WHEN PICKED
@@ -55,8 +143,14 @@ public class AbilityPickup : MonoBehaviour
                 visuals.UnlockAnimationModel();
         }
 
-        // ================= UI / SYSTEM =================
-        switch (abilityToUnlock)
+        // BRIGHTNESS ability
+        if (abilityToUnlock == AbilityType.Brightness)
+        {
+            UIManager.Instance.UnlockBrightness();
+        }
+
+        // EXIT ability
+        if (abilityToUnlock == AbilityType.Exit)
         {
             case AbilityType.UI:
                 UIManager.Instance?.EnableGameUI();
