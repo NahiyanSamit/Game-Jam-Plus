@@ -37,10 +37,9 @@ public class PlayerController : MonoBehaviour
     public Vector3 hitOffset = new Vector3(0, 1f, 1f);
     public LayerMask breakableLayer;
 
-    [Header("Respawn / Death")]
+    [Header("Respawn Settings")]
     public float fallThreshold = -10f;
     public float historyDuration = 2.0f;
-    public Transform respawnPoint;             // ⭐ NEW
 
     [SerializeField] private int damage = 2;
 
@@ -49,7 +48,6 @@ public class PlayerController : MonoBehaviour
     private bool _jumpRequest;
     private bool _isCameraActive = false;
     private float _nextStepTime;
-    private bool controlsEnabled = true;       // ⭐ NEW
 
     private Vector3 _initialModelLocalPos;
     private Quaternion _initialModelLocalRot;
@@ -90,7 +88,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!controlsEnabled) return; // ⭐ BLOCK INPUT
         if (GameManager.Instance == null) return;
 
         if (transform.position.y < fallThreshold)
@@ -102,6 +99,7 @@ public class PlayerController : MonoBehaviour
                 gunModel.SetActive(true);
         }
 
+        // ================= JUMP =================
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             if (GameManager.Instance.HasAbility(AbilityType.Jump))
@@ -115,9 +113,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // ================= WEAPON SWITCH =================
         if (Input.GetButtonDown("Fire2"))
         {
-            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun &&
+                GameManager.Instance.HasAbility(AbilityType.Gun))
             {
                 GameManager.Instance.ChangeWeapon(AbilityType.Punch);
                 gunModel.SetActive(false);
@@ -129,17 +129,27 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // ================= ATTACK =================
         if (Input.GetMouseButtonDown(0))
         {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun)
+            // 🔫 GUN
+            if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Gun &&
+                GameManager.Instance.HasAbility(AbilityType.Gun))
+            {
                 ShootGun();
-            else
+            }
+            // 👊 PUNCH (FIXED — ability required)
+            else if (GameManager.Instance.GetCurrentWeapon() == AbilityType.Punch &&
+                     GameManager.Instance.HasAbility(AbilityType.Punch))
+            {
                 PerformPunch();
+            }
         }
 
+        // ================= CAMERA =================
         if (!_isCameraActive && GameManager.Instance.HasAbility(AbilityType.Camera))
         {
             if (gameCamera != null)
@@ -152,11 +162,9 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!controlsEnabled) return; // ⭐ BLOCK MOVEMENT
-
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 inputVector = new Vector3(horizontalInput, 0f, verticalInput);
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        Vector3 inputVector = new Vector3(h, 0f, v);
 
         Vector3 movement = inputVector * moveSpeed;
         _rb.MovePosition(_rb.position + movement * Time.fixedDeltaTime);
@@ -164,9 +172,7 @@ public class PlayerController : MonoBehaviour
         if (inputVector.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(inputVector);
-            _rb.MoveRotation(
-                Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime)
-            );
+            _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
         }
 
         if (characterAnimator != null)
@@ -230,7 +236,7 @@ public class PlayerController : MonoBehaviour
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlaySFX(punchSound);
 
-        Vector3 spherePos = transform.position + transform.up * hitOffset.y + transform.forward * hitOffset.z;
+        Vector3 spherePos = transform.position + (transform.up * hitOffset.y) + (transform.forward * hitOffset.z);
         Collider[] hits = Physics.OverlapSphere(spherePos, punchRange, breakableLayer);
 
         foreach (var hit in hits)
@@ -249,37 +255,6 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(0, 2, 0);
 
         _rb.linearVelocity = Vector3.zero;
-    }
-
-    // ===================== DEATH SYSTEM =====================
-
-    public void DisableControls()
-    {
-        controlsEnabled = false;
-        _rb.linearVelocity = Vector3.zero;
-    }
-
-    public void RevivePlayer()
-    {
-        controlsEnabled = true;
-
-        if (respawnPoint != null)
-            transform.position = respawnPoint.position;
-
-        _rb.linearVelocity = Vector3.zero;
-
-        Health health = GetComponent<Health>();
-        if (health != null)
-            health.ResetHealth();
-    }
-
-    void LateUpdate()
-    {
-        if (characterAnimator != null)
-        {
-            characterAnimator.transform.localPosition = _initialModelLocalPos;
-            characterAnimator.transform.localRotation = _initialModelLocalRot;
-        }
     }
 
     bool IsGrounded()
