@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4024624854928891271}
   - component: {fileID: 367956042024185552}
   - component: {fileID: 8991311985904842278}
+  - component: {fileID: 2968099350213429880}
   m_Layer: 0
   m_Name: SoundPickup
   m_TagString: Untagged
@@ -66,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 4316761a2a3bc184fad3f7abc1628cc1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -123,3 +124,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityToUnlock: 7
   pickupEffect: {fileID: 0}
+--- !u!114 &2968099350213429880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4404176683333528322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9d19436ab2fde47a25075f16f4399d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatHight: 0.4
+  duration: 1
