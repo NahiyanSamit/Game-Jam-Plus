@@ -3,6 +3,7 @@ using DG.Tweening;
 using SmallHedge.SoundManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
     public float fallThreshold = -10f;
     public float historyDuration = 2.0f;
 
-    [SerializeField] private int damage = 2;
+    [FormerlySerializedAs("_playerDamage")] [SerializeField] private int playerDamage = 2;
 
     private Rigidbody _rb;
     private float _distToGround;
@@ -221,7 +222,7 @@ public class PlayerController : MonoBehaviour
         {
             Health health = hit.collider.GetComponent<Health>();
             if (health != null)
-                health.TakeDamage(damage);
+                health.TakeDamage(playerDamage);
 
             BreakableBox box = hit.collider.GetComponent<BreakableBox>();
             if (box != null)
