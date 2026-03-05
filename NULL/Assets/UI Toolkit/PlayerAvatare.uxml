@@ -1,0 +1,4 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="PlayerAvatareBackground" style="flex-grow: 1; position: absolute; height: 70px; width: 70px; top: 50px; left: 40px; background-color: rgb(255, 165, 0); border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px;" />
+    <ui:VisualElement name="PlayerAvatare" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icon/Player.png?fileID=2800000&amp;guid=427362bfc28a8d349b63ca95f21cf60c&amp;type=3#Player&quot;); border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; position: absolute; height: 65px; width: 65px; top: 52.5px; left: 42.5px;" />
+</ui:UXML>
