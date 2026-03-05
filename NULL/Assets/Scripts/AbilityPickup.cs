@@ -44,7 +44,12 @@ public class AbilityPickup : MonoBehaviour
 
         // ================= 5. SOUND / BRIGHTNESS =================
         if (abilityToUnlock == AbilityType.Sound)
+        {
             SoundManager.Instance?.UnlockSoundControl();
+
+            // Ensure the main UI shows the unlocked sound button
+            UIManager.Instance?.UnlockSound();
+        }
 
         if (abilityToUnlock == AbilityType.Brightness)
             UIManager.Instance?.UnlockBrightness();

@@ -40,7 +40,10 @@ public class AbilityApplier : MonoBehaviour
         if (SoundManager.Instance != null)
         {
             if (!GameManager.Instance.HasAbility(AbilityType.Sound))
+            {
                 SoundManager.Instance.LockSoundControl();
+                UIManager.Instance?.LockSound();
+            }
         }
 
 

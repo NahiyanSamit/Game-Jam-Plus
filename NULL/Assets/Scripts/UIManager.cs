@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI; 
 using TMPro;
 
 public class UIManager : MonoBehaviour
@@ -16,8 +15,8 @@ public class UIManager : MonoBehaviour
     [Header("Text Elements")]
     public TMP_Text coinText; 
 
-    public int coin = 0;
-    public bool isBrightnessUnlocked = false;
+    public int coin;
+    public bool isBrightnessUnlocked;
 
     void Awake()
     {
@@ -56,7 +55,7 @@ public class UIManager : MonoBehaviour
         if (coinText != null)
         {
             coin += coins;
-            coinText.text = "COINS: " + coins.ToString();
+            coinText.text = "COINS: " + coin.ToString();
         }
     }
 
@@ -67,44 +66,72 @@ public class UIManager : MonoBehaviour
 
     public void UnlockSound()
     {
-        soundButton.SetUnlocked(true);
+        // Ensure the main UI is visible so the button can be seen
+        if (mainUIPanel != null && !mainUIPanel.activeSelf)
+            mainUIPanel.SetActive(true);
+
+        if (soundButton != null)
+        {
+            if (soundButton.gameObject != null && !soundButton.gameObject.activeSelf)
+                soundButton.gameObject.SetActive(true);
+
+            soundButton.SetUnlocked(true);
+            Debug.Log("UIManager: Sound button unlocked and shown.");
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: soundButton reference is null.");
+        }
     }
 
     public void UnlockSettings()
     {
-        settingsButton.SetUnlocked(true);
+        if (settingsButton != null)
+            settingsButton.SetUnlocked(true);
+        else
+            Debug.LogWarning("UIManager: settingsButton reference is null.");
     }
 
     public void UnlockBrightness()
     {
         isBrightnessUnlocked = true;
-        brightnessIcon.SetUnlocked(true);
+        if (brightnessIcon != null)
+            brightnessIcon.SetUnlocked(true);
+        else
+            Debug.LogWarning("UIManager: brightnessIcon reference is null.");
     }
 
     public void UnlockExit()
     {
-        exitButton.SetUnlocked(true);
+        if (exitButton != null)
+            exitButton.SetUnlocked(true);
+        else
+            Debug.LogWarning("UIManager: exitButton reference is null.");
     }
     
     public void LockSound()
     {
-        soundButton.SetUnlocked(false);
+        if (soundButton != null)
+            soundButton.SetUnlocked(false);
     }
 
     public void LockSettings()
     {
-        settingsButton.SetUnlocked(false);
+        if (settingsButton != null)
+            settingsButton.SetUnlocked(false);
     }
 
     public void LockBrightness()
     {
         isBrightnessUnlocked = false;
-        brightnessIcon.SetUnlocked(false);
+        if (brightnessIcon != null)
+            brightnessIcon.SetUnlocked(false);
     }
 
     public void LockExit()
     {
-        exitButton.SetUnlocked(false);
+        if (exitButton != null)
+            exitButton.SetUnlocked(false);
     }
 
 }

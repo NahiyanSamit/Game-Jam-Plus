@@ -19,12 +19,28 @@ public class SoundSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(_systemCollections.AddedInTheInventory && !perfectSound)
+        // Only open the sound option UI if the systemCollections reports an added item
+        // AND the collected ability type is Sound (prevents other pickups from opening this UI).
+        if (_systemCollections != null && _systemCollections.AddedInTheInventory && !perfectSound)
         {
-            _brokenSoundSystem.BrokenSoundPrefab.SetActive(false);
-            _soundOptionUI.gameObject.SetActive(true);
-            perfectSound=true;
-          
+            if (_systemCollections.LastCollectedAbility == AbilityType.Sound && GameManager.Instance != null && GameManager.Instance.HasAbility(AbilityType.Sound))
+            {
+                if (_brokenSoundSystem != null && _brokenSoundSystem.BrokenSoundPrefab != null)
+                    _brokenSoundSystem.BrokenSoundPrefab.SetActive(false);
+
+                if (_soundOptionUI != null)
+                    _soundOptionUI.gameObject.SetActive(true);
+
+                perfectSound = true;
+
+                // Reset the flag so subsequent unrelated pickups won't retrigger this
+                _systemCollections.AddedInTheInventory = false;
+            }
+            else
+            {
+                // Clear the flag so other systems aren't affected.
+                _systemCollections.AddedInTheInventory = false;
+            }
         }
 
         EscapeSoundOption();
@@ -38,9 +54,10 @@ public class SoundSystem : MonoBehaviour
 
     private void EscapeSoundOption()
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            _soundOptionUI.gameObject.SetActive(false);
+            if (_soundOptionUI != null)
+                _soundOptionUI.gameObject.SetActive(false);
         }
     }
 }
