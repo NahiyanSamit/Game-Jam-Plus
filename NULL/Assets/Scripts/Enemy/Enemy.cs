@@ -69,14 +69,14 @@ public class Enemy : MonoBehaviour
 
     private void Death()
     {
-        
+
         if (healthScript.CurrentHealth <= 0)
         {
             deathTrigger = true;
             Debug.Log("Enemy will die");
             OnDeath();
         }
-        
+
     }
     private void OnDeath()
     {
