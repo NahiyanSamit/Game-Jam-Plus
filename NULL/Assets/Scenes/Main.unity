@@ -8931,8 +8931,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fillImage: {fileID: 1090146857}
   health: {fileID: 2060188228}
-  slider: {fileID: 0}
-  sliderContainer: {fileID: 0}
   isPlayer: 1
   fillSmoothSpeed: 8
 --- !u!1 &2060959300
